@@ -3,6 +3,12 @@
     <head>
         <title>sample</title>
         <script>
+            function add() {
+                var list = document.getElementById("list");
+                var item = document.createElement("li");
+                item.textContent = "item";
+                list.appendChild(item);
+            }
             function hello() {
                 var input1 = document.getElementById("input1").value;
                 document.getElementById("view").textContent = input1;
@@ -16,7 +22,8 @@
         <p>this is sample page.</p>
 
         <h2>items</h2>
-        <ul>
+        <button onclick="add()">add</button>
+        <ul id="list">
             <li>item1</li>
             <li>item2</li>
             <li>item3</li>
