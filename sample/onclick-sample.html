@@ -9,6 +9,13 @@
                 item.textContent = "item";
                 list.appendChild(item);
             }
+            function remove() {
+                var list = document.getElementById("list");
+                var item = list.lastChild;
+                if (item) {
+                    list.removeChild(item);
+                }
+            }
             function hello() {
                 var input1 = document.getElementById("input1").value;
                 document.getElementById("view").textContent = input1;
@@ -23,6 +30,7 @@
 
         <h2>items</h2>
         <button onclick="add()">add</button>
+        <button onclick="remove()">remove</button>
         <ul id="list">
             <li>item1</li>
             <li>item2</li>
