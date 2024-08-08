@@ -61,9 +61,22 @@ function load_data() {
         let datetime = new Date(checkin.createdAt * 1000);
         checkin_datetime.textContent = datetime.toLocaleDateString() + ' ' + datetime.toLocaleTimeString();
 
+        let photo_count = checkin.photos.count;
+        // console.log("photo count: " + photo_count);
+        let photo_view = document.createElement("div");
+        if (photo_count > 0) {
+            for (let photos of checkin.photos.items) {
+                let photo_item = document.createElement("img");
+                let photo_url = photos.prefix + Math.round(photos.width/10) + 'x' + Math.round(photos.height/10) + photos.suffix;
+                photo_item.src = photo_url;
+                photo_view.appendChild(photo_item);
+            }
+        }
+
         var item_hr = document.createElement("hr");
         component.appendChild(venue_name);
         component.appendChild(checkin_datetime);
+        component.appendChild(photo_view);
         component.appendChild(item_hr);
         display.appendChild(component);
 
