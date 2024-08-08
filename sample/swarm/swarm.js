@@ -47,4 +47,13 @@ function load_data() {
     const checkin_data = JSON.parse(checkins);
     // console.log('checkin_data: ' + checkin_data);
 
+    var display = document.getElementById("checkin_list");
+    for (let checkin of checkin_data.response.checkins.items) {
+        // console.log("checkin: " + checkin.venue.name);
+
+        var component = document.createElement("div");
+        component.textContent = checkin.venue.name;
+        display.appendChild(component);
+
+    }
 }
