@@ -66,14 +66,24 @@ function load_data() {
         let photo_view = document.createElement("div");
         if (photo_count > 0) {
             for (let photos of checkin.photos.items) {
-                let photo_item = document.createElement("img");
+                // let photo_item = document.createElement("img");
+                let photo_item = document.createElement("div");
                 let photo_url = photos.prefix + Math.round(photos.width/10) + 'x' + Math.round(photos.height/10) + photos.suffix;
-                photo_item.src = photo_url;
+                // photo_item.src = photo_url;
+                photo_item.textContent = photo_url;
                 photo_view.appendChild(photo_item);
             }
         }
 
+        let comment_view = document.createElement("div");
+        if ('shout' in checkin) {
+            let comment = checkin.shout;
+            console.log('comment: ' + comment);
+            comment_view.textContent = comment;
+        }
+
         var item_hr = document.createElement("hr");
+        component.appendChild(comment_view);
         component.appendChild(venue_name);
         component.appendChild(checkin_datetime);
         component.appendChild(photo_view);
