@@ -49,10 +49,22 @@ function load_data() {
 
     var display = document.getElementById("checkin_list");
     for (let checkin of checkin_data.response.checkins.items) {
-        // console.log("checkin: " + checkin.venue.name);
+        console.log("checkin: " + checkin.venue.name);
+        console.log("createdAt: " + checkin.venue.createdAt);
 
-        var component = document.createElement("div");
-        component.textContent = checkin.venue.name;
+        let component = document.createElement("div");
+
+        let venue_name = document.createElement("div");
+        venue_name.textContent = checkin.venue.name;
+
+        let checkin_datetime = document.createElement("div");
+        let datetime = new Date(checkin.createdAt * 1000);
+        checkin_datetime.textContent = datetime.toLocaleDateString() + ' ' + datetime.toLocaleTimeString();
+
+        var item_hr = document.createElement("hr");
+        component.appendChild(venue_name);
+        component.appendChild(checkin_datetime);
+        component.appendChild(item_hr);
         display.appendChild(component);
 
     }
