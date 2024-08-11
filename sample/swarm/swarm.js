@@ -55,7 +55,12 @@ function load_data() {
         let component = document.createElement("div");
 
         let venue_name = document.createElement("div");
-        venue_name.textContent = checkin.venue.name;
+        if ('shout' in checkin) {
+            venue_name.textContent = checkin.shout + ' (@ ' + checkin.venue.name + ')';
+        }
+        else {
+            venue_name.textContent = "I'm at " + checkin.venue.name;
+        }
 
         let checkin_datetime = document.createElement("div");
         let datetime = new Date(checkin.createdAt * 1000);
@@ -75,17 +80,10 @@ function load_data() {
             }
         }
 
-        let comment_view = document.createElement("div");
-        if ('shout' in checkin) {
-            let comment = checkin.shout;
-            console.log('comment: ' + comment);
-            comment_view.textContent = comment;
-        }
-
         var item_hr = document.createElement("hr");
-        component.appendChild(comment_view);
-        component.appendChild(venue_name);
+        // component.appendChild(comment_view);
         component.appendChild(checkin_datetime);
+        component.appendChild(venue_name);
         component.appendChild(photo_view);
         component.appendChild(item_hr);
         display.appendChild(component);
