@@ -55,11 +55,12 @@ function load_data() {
         let component = document.createElement("div");
 
         let venue_name = document.createElement("div");
+        const location = ('address' in checkin.venue.location)? 1: 0;
         if ('shout' in checkin) {
-            venue_name.textContent = checkin.shout + ' (@ ' + checkin.venue.name + ')';
+            venue_name.textContent = checkin.shout + ' (@ ' + checkin.venue.name + ' in ' + checkin.venue.location.formattedAddress[location] + ')';
         }
         else {
-            venue_name.textContent = "I'm at " + checkin.venue.name;
+            venue_name.textContent = "I'm at " + checkin.venue.name + ' in ' + checkin.venue.location.formattedAddress[location];
         }
 
         let checkin_datetime = document.createElement("div");
