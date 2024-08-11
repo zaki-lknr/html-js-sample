@@ -62,6 +62,17 @@ function load_data() {
         else {
             venue_name.textContent = "I'm at " + checkin.venue.name + ' in ' + checkin.venue.location.formattedAddress[location];
         }
+        let form_part = document.createElement("div");
+        let url_input = document.createElement("input");
+        url_input.type = 'text';
+        let rest_button = document.createElement("button");
+        rest_button.textContent = "get url";
+        // rest_button.onclick = 'get_shortcut_url()'; // 効かない
+        rest_button.addEventListener('click', ()=> {
+            get_shortcut_url(checkin.id);
+        });
+        form_part.appendChild(url_input);
+        form_part.appendChild(rest_button);
 
         let checkin_datetime = document.createElement("div");
         let datetime = new Date(checkin.createdAt * 1000);
@@ -85,9 +96,14 @@ function load_data() {
         // component.appendChild(comment_view);
         component.appendChild(checkin_datetime);
         component.appendChild(venue_name);
+        component.appendChild(form_part);
         component.appendChild(photo_view);
         component.appendChild(item_hr);
         display.appendChild(component);
 
     }
+}
+
+function get_shortcut_url(checkin_id) {
+    console.log("get_shortcut_url() begin: " + checkin_id);
 }
