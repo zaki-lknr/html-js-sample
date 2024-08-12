@@ -108,7 +108,16 @@ function load_data() {
 function get_shortcut_url(checkin_id) {
     console.log("get_shortcut_url() begin: " + checkin_id);
 
-    set_url(checkin_id);
+    let url = set_url(checkin_id);
+    console.log(url);
+    let form_url = document.getElementById(checkin_id).value;
+    console.log(form_url); // 非同期なので取れない
+    // set_clipboard()
+    const promise = new Promise((resolve) => {
+        resolve(url);
+    }).then((val) => {
+        console.log(val);  // Promiseをresolve()したので取れる
+    })
 }
 
 async function set_url(checkin_id) {
@@ -149,4 +158,5 @@ async function set_url(checkin_id) {
 
 
     document.getElementById(checkin_id).value = shortcut_url;
+    return shortcut_url;
 }
