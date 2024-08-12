@@ -65,6 +65,7 @@ function load_data() {
         let form_part = document.createElement("div");
         let url_input = document.createElement("input");
         url_input.type = 'text';
+        url_input.id = checkin.id;
         let rest_button = document.createElement("button");
         rest_button.textContent = "get url";
         // rest_button.onclick = 'get_shortcut_url()'; // 効かない
@@ -106,4 +107,21 @@ function load_data() {
 
 function get_shortcut_url(checkin_id) {
     console.log("get_shortcut_url() begin: " + checkin_id);
+
+    set_url(checkin_id);
+}
+
+async function set_url(checkin_id) {
+    const configure = load_configure();
+    const url = 'https://api.foursquare.com/v2/checkins/' + checkin_id + '?v=20231010&oauth_token=' + configure.oauth_token;
+    const headers = new Headers();
+    headers.append('accept', 'application/json');
+
+    const res = await fetch(url, { headers: headers });
+
+    const response = await res.json();
+    console.log(response.response.checkin.checkinShortUrl);
+    // return response;
+    // response.response.checkin.checkinShortUrl;
+    document.getElementById(checkin_id).value = response.response.checkin.checkinShortUrl;
 }
