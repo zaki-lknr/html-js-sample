@@ -55,6 +55,7 @@ function load_data() {
         let component = document.createElement("div");
 
         let venue_name = document.createElement("div");
+        venue_name.id = checkin.id + '_comment';
         const location = ('address' in checkin.venue.location)? 1: 0;
         if ('shout' in checkin) {
             venue_name.textContent = checkin.shout + ' (@ ' + checkin.venue.name + ' in ' + checkin.venue.location.formattedAddress[location] + ')';
@@ -110,6 +111,10 @@ async function get_shortcut_url(checkin_id) {
 
     let url = await get_url(checkin_id);
     document.getElementById(checkin_id).value = url;
+
+    let comment = document.getElementById(checkin_id + '_comment').textContent;
+    comment += "\n" + url;
+    console.log(comment);
 }
 
 async function get_url(checkin_id) {
