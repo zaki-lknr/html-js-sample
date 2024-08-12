@@ -69,6 +69,9 @@ function load_data() {
         let url_input = document.createElement("input");
         url_input.type = 'text';
         url_input.id = checkin.id;
+        if ('checkinShortUrl' in checkin) {
+            url_input.value = checkin.checkinShortUrl;
+        }
         let rest_button = document.createElement("button");
         rest_button.textContent = "get url";
         // rest_button.onclick = 'get_shortcut_url()'; // 効かない
