@@ -112,16 +112,50 @@ function get_shortcut_url(checkin_id) {
 }
 
 async function set_url(checkin_id) {
-    const configure = load_configure();
-    const url = 'https://api.foursquare.com/v2/checkins/' + checkin_id + '?v=20231010&oauth_token=' + configure.oauth_token;
-    const headers = new Headers();
-    headers.append('accept', 'application/json');
+    const checkins = localStorage.getItem('rest_response');
+    // console.log('checkins: ' + checkins);
+    const checkin_data = JSON.parse(checkins);
 
-    const res = await fetch(url, { headers: headers });
+    let shortcut_url;
+    for (let checkin of checkin_data.response.checkins.items) {
+        // console.log('saved checkin id: ' + checkin.id);
+        if (checkin_id === checkin.id) {
+            // consolog.log('checkin id: ' + checkin_id);
+            if ('checkinShortUrl' in checkin) {
+                console.log('shortcut url is exist');
+                shortcut_url = checkin.checkinShortUrl;
+            }
+            else {
+                console.log('shortcut url is not exist');
 
-    const response = await res.json();
-    console.log(response.response.checkin.checkinShortUrl);
+                const configure = load_configure();
+                const url = 'https://api.foursquare.com/v2/checkins/' + checkin_id + '?v=20231010&oauth_token=' + configure.oauth_token;
+                const headers = new Headers();
+                headers.append('accept', 'application/json');
+            
+                const res = await fetch(url, { headers: headers });
+            
+                const response = await res.json();
+                console.log(response.response.checkin.checkinShortUrl);
+            
+                shortcut_url = response.response.checkin.checkinShortUrl;
+
+            }
+        }
+    }
+
+
+    // const configure = load_configure();
+    // const url = 'https://api.foursquare.com/v2/checkins/' + checkin_id + '?v=20231010&oauth_token=' + configure.oauth_token;
+    // const headers = new Headers();
+    // headers.append('accept', 'application/json');
+
+    // const res = await fetch(url, { headers: headers });
+
+    // const response = await res.json();
+    // console.log(response.response.checkin.checkinShortUrl);
+
     // return response;
     // response.response.checkin.checkinShortUrl;
-    document.getElementById(checkin_id).value = response.response.checkin.checkinShortUrl;
+    document.getElementById(checkin_id).value = shortcut_url;
 }
