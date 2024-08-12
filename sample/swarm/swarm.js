@@ -105,22 +105,14 @@ function load_data() {
     }
 }
 
-function get_shortcut_url(checkin_id) {
+async function get_shortcut_url(checkin_id) {
     console.log("get_shortcut_url() begin: " + checkin_id);
 
-    let url = set_url(checkin_id);
-    console.log(url);
-    let form_url = document.getElementById(checkin_id).value;
-    console.log(form_url); // 非同期なので取れない
-    // set_clipboard()
-    const promise = new Promise((resolve) => {
-        resolve(url);
-    }).then((val) => {
-        console.log(val);  // Promiseをresolve()したので取れる
-    })
+    let url = await get_url(checkin_id);
+    document.getElementById(checkin_id).value = url;
 }
 
-async function set_url(checkin_id) {
+async function get_url(checkin_id) {
     const checkins = localStorage.getItem('rest_response');
     // console.log('checkins: ' + checkins);
     const checkin_data = JSON.parse(checkins);
@@ -156,7 +148,5 @@ async function set_url(checkin_id) {
     }
     localStorage.setItem('rest_response', JSON.stringify(checkin_data));
 
-
-    document.getElementById(checkin_id).value = shortcut_url;
     return shortcut_url;
 }
