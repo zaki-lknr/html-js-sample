@@ -39,6 +39,8 @@ async function get_data() {
     // console.log('body: ' + body);
 
     localStorage.setItem('rest_response', body);
+
+    load_data();
 }
 
 function load_data() {
