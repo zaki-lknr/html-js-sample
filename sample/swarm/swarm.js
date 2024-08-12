@@ -2,7 +2,7 @@ function save_configure() {
     console.log("save_configure() begin");
     // get form data
     let input_token = document.getElementById("oauth_token").value;
-    console.log("oauth_token: " + input_token);
+    // console.log("oauth_token: " + input_token);
 
     const swarm_configure = {
         oauth_token: input_token
@@ -136,26 +136,17 @@ async function set_url(checkin_id) {
                 const res = await fetch(url, { headers: headers });
             
                 const response = await res.json();
-                console.log(response.response.checkin.checkinShortUrl);
+                // console.log(response.response.checkin.checkinShortUrl);
             
                 shortcut_url = response.response.checkin.checkinShortUrl;
 
+                checkin.checkinShortUrl = shortcut_url;
+                break;
             }
         }
     }
+    localStorage.setItem('rest_response', JSON.stringify(checkin_data));
 
 
-    // const configure = load_configure();
-    // const url = 'https://api.foursquare.com/v2/checkins/' + checkin_id + '?v=20231010&oauth_token=' + configure.oauth_token;
-    // const headers = new Headers();
-    // headers.append('accept', 'application/json');
-
-    // const res = await fetch(url, { headers: headers });
-
-    // const response = await res.json();
-    // console.log(response.response.checkin.checkinShortUrl);
-
-    // return response;
-    // response.response.checkin.checkinShortUrl;
     document.getElementById(checkin_id).value = shortcut_url;
 }
