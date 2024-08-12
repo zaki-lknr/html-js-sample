@@ -115,6 +115,7 @@ async function get_shortcut_url(checkin_id) {
     let comment = document.getElementById(checkin_id + '_comment').textContent;
     comment += "\n" + url;
     console.log(comment);
+    navigator.clipboard.writeText(comment);
 }
 
 async function get_url(checkin_id) {
