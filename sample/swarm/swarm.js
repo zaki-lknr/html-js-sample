@@ -50,6 +50,7 @@ function load_data() {
     // console.log('checkin_data: ' + checkin_data);
 
     var display = document.getElementById("checkin_list");
+    let index = 0;
     for (let checkin of checkin_data.response.checkins.items) {
         console.log("checkin: " + checkin.venue.name);
         console.log("createdAt: " + checkin.venue.createdAt);
@@ -83,7 +84,7 @@ function load_data() {
 
         let checkin_datetime = document.createElement("div");
         let datetime = new Date(checkin.createdAt * 1000);
-        checkin_datetime.textContent = datetime.toLocaleDateString() + ' ' + datetime.toLocaleTimeString();
+        checkin_datetime.textContent = '['+ (++index) + '] ' + datetime.toLocaleDateString() + ' ' + datetime.toLocaleTimeString();
 
         let photo_count = checkin.photos.count;
         // console.log("photo count: " + photo_count);
