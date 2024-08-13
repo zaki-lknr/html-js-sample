@@ -59,12 +59,18 @@ function load_data() {
 
         let venue_name = document.createElement("div");
         venue_name.id = checkin.id + '_comment';
-        const location = ('address' in checkin.venue.location)? 1: 0;
+
+        let location_str = '';
+        // formattedAddressが無いヴェニューもある
+        if ('formattedAddress' in checkin.venue.location) {
+            const location = ('address' in checkin.venue.location)? 1: 0;
+            location_str = ' in ' + checkin.venue.location.formattedAddress[location];
+        }
         if ('shout' in checkin) {
-            venue_name.textContent = checkin.shout + ' (@ ' + checkin.venue.name + ' in ' + checkin.venue.location.formattedAddress[location] + ')';
+            venue_name.textContent = checkin.shout + ' (@ ' + checkin.venue.name + location_str + ')';
         }
         else {
-            venue_name.textContent = "I'm at " + checkin.venue.name + ' in ' + checkin.venue.location.formattedAddress[location];
+            venue_name.textContent = "I'm at " + checkin.venue.name + location_str;
         }
         let form_part = document.createElement("div");
         let url_input = document.createElement("input");
