@@ -122,6 +122,18 @@ function load_data() {
     }
 }
 
+function clear_data() {
+    console.log('clear_data() begin');
+    let display = document.getElementById("checkin_list");
+    // display.removeChild(display.firstChild);
+    // for(let child of display.children) {  // ループ中にリストが変化するのでNG
+        // display.removeChild(child);
+    while(display.firstChild) {
+        // console.log(display);
+        display.removeChild(display.firstChild);
+    }
+}
+
 async function get_shortcut_url(checkin_id) {
     // console.log("get_shortcut_url() begin: " + checkin_id);
 
