@@ -26,7 +26,7 @@ function load_configure() {
     return configure;
 }
 
-async function get_data() {
+async function reload_data() {
     const configure = load_configure();
     const url = 'https://api.foursquare.com/v2/users/self/checkins?v=20231010&limit=30&offset=0&oauth_token=' + configure.oauth_token;
     // console.log('url: ' + url);
@@ -40,6 +40,7 @@ async function get_data() {
 
     localStorage.setItem('rest_response', body);
 
+    clear_data();
     load_data();
 }
 
