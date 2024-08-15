@@ -46,75 +46,79 @@ async function get_data() {
 function load_data() {
     const checkins = localStorage.getItem('rest_response');
     // console.log('checkins: ' + checkins);
-    const checkin_data = JSON.parse(checkins);
-    // console.log('checkin_data: ' + checkin_data);
+    if (checkins === null) {
+        console.log('no data');
+    }
+    else {
+        const checkin_data = JSON.parse(checkins);
+        // console.log('checkin_data: ' + checkin_data);
 
-    var display = document.getElementById("checkin_list");
-    let index = 0;
-    for (let checkin of checkin_data.response.checkins.items) {
-        // console.log("checkin: " + checkin.venue.name);
-        // console.log("createdAt: " + checkin.venue.createdAt);
+        var display = document.getElementById("checkin_list");
+        let index = 0;
+        for (let checkin of checkin_data.response.checkins.items) {
+            // console.log("checkin: " + checkin.venue.name);
+            // console.log("createdAt: " + checkin.venue.createdAt);
 
-        let component = document.createElement("div");
+            let component = document.createElement("div");
 
-        let venue_name = document.createElement("div");
-        venue_name.id = checkin.id + '_comment';
+            let venue_name = document.createElement("div");
+            venue_name.id = checkin.id + '_comment';
 
-        let location_str = '';
-        // formattedAddressが無いヴェニューもある
-        if ('formattedAddress' in checkin.venue.location) {
-            const location = ('address' in checkin.venue.location)? 1: 0;
-            location_str = ' in ' + checkin.venue.location.formattedAddress[location];
-        }
-        if ('shout' in checkin) {
-            venue_name.textContent = checkin.shout + ' (@ ' + checkin.venue.name + location_str + ')';
-        }
-        else {
-            venue_name.textContent = "I'm at " + checkin.venue.name + location_str;
-        }
-        let form_part = document.createElement("div");
-        let url_input = document.createElement("input");
-        url_input.type = 'text';
-        url_input.id = checkin.id;
-        if ('checkinShortUrl' in checkin) {
-            url_input.value = checkin.checkinShortUrl;
-        }
-        let rest_button = document.createElement("button");
-        rest_button.textContent = "get url";
-        // rest_button.onclick = 'get_shortcut_url()'; // 効かない
-        rest_button.addEventListener('click', ()=> {
-            get_shortcut_url(checkin.id);
-        });
-        form_part.appendChild(url_input);
-        form_part.appendChild(rest_button);
-
-        let checkin_datetime = document.createElement("div");
-        let datetime = new Date(checkin.createdAt * 1000);
-        checkin_datetime.textContent = '['+ (++index) + '] ' + datetime.toLocaleDateString() + ' ' + datetime.toLocaleTimeString();
-
-        let photo_count = checkin.photos.count;
-        // console.log("photo count: " + photo_count);
-        let photo_view = document.createElement("div");
-        if (photo_count > 0) {
-            for (let photos of checkin.photos.items) {
-                // let photo_item = document.createElement("img");
-                let photo_item = document.createElement("div");
-                let photo_url = photos.prefix + Math.round(photos.width/10) + 'x' + Math.round(photos.height/10) + photos.suffix;
-                // photo_item.src = photo_url;
-                photo_item.textContent = photo_url;
-                photo_view.appendChild(photo_item);
+            let location_str = '';
+            // formattedAddressが無いヴェニューもある
+            if ('formattedAddress' in checkin.venue.location) {
+                const location = ('address' in checkin.venue.location)? 1: 0;
+                location_str = ' in ' + checkin.venue.location.formattedAddress[location];
             }
+            if ('shout' in checkin) {
+                venue_name.textContent = checkin.shout + ' (@ ' + checkin.venue.name + location_str + ')';
+            }
+            else {
+                venue_name.textContent = "I'm at " + checkin.venue.name + location_str;
+            }
+            let form_part = document.createElement("div");
+            let url_input = document.createElement("input");
+            url_input.type = 'text';
+            url_input.id = checkin.id;
+            if ('checkinShortUrl' in checkin) {
+                url_input.value = checkin.checkinShortUrl;
+            }
+            let rest_button = document.createElement("button");
+            rest_button.textContent = "get url";
+            // rest_button.onclick = 'get_shortcut_url()'; // 効かない
+            rest_button.addEventListener('click', ()=> {
+                get_shortcut_url(checkin.id);
+            });
+            form_part.appendChild(url_input);
+            form_part.appendChild(rest_button);
+
+            let checkin_datetime = document.createElement("div");
+            let datetime = new Date(checkin.createdAt * 1000);
+            checkin_datetime.textContent = '['+ (++index) + '] ' + datetime.toLocaleDateString() + ' ' + datetime.toLocaleTimeString();
+
+            let photo_count = checkin.photos.count;
+            // console.log("photo count: " + photo_count);
+            let photo_view = document.createElement("div");
+            if (photo_count > 0) {
+                for (let photos of checkin.photos.items) {
+                    // let photo_item = document.createElement("img");
+                    let photo_item = document.createElement("div");
+                    let photo_url = photos.prefix + Math.round(photos.width/10) + 'x' + Math.round(photos.height/10) + photos.suffix;
+                    // photo_item.src = photo_url;
+                    photo_item.textContent = photo_url;
+                    photo_view.appendChild(photo_item);
+                }
+            }
+
+            var item_hr = document.createElement("hr");
+            // component.appendChild(comment_view);
+            component.appendChild(checkin_datetime);
+            component.appendChild(venue_name);
+            component.appendChild(form_part);
+            component.appendChild(photo_view);
+            component.appendChild(item_hr);
+            display.appendChild(component);
         }
-
-        var item_hr = document.createElement("hr");
-        // component.appendChild(comment_view);
-        component.appendChild(checkin_datetime);
-        component.appendChild(venue_name);
-        component.appendChild(form_part);
-        component.appendChild(photo_view);
-        component.appendChild(item_hr);
-        display.appendChild(component);
-
     }
 }
 
