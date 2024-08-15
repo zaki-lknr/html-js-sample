@@ -49,6 +49,9 @@ function load_data() {
     // console.log('checkins: ' + checkins);
     if (checkins === null) {
         console.log('no data');
+        // button文言の更新
+        let button = document.getElementById("reload_button");
+        button.textContent = 'get checkin data';
     }
     else {
         const checkin_data = JSON.parse(checkins);
