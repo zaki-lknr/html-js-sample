@@ -56,8 +56,9 @@ function load_data() {
     else {
         const checkin_data = JSON.parse(checkins);
         // console.log('checkin_data: ' + checkin_data);
+        let view_image = document.getElementById("view_image");
 
-        var display = document.getElementById("checkin_list");
+        let display = document.getElementById("checkin_list");
         let index = 0;
         for (let checkin of checkin_data.response.checkins.items) {
             // console.log("checkin: " + checkin.venue.name);
@@ -110,12 +111,12 @@ function load_data() {
             let photo_view = document.createElement("div");
             if (photo_count > 0) {
                 for (let photos of checkin.photos.items) {
-                    // let photo_item = document.createElement("img");
-                    let photo_item = document.createElement("div");
+                    let photo_item = document.createElement("img");
                     let photo_url = photos.prefix + Math.round(photos.width/10) + 'x' + Math.round(photos.height/10) + photos.suffix;
-                    // photo_item.src = photo_url;
-                    photo_item.textContent = photo_url;
-                    photo_view.appendChild(photo_item);
+                    photo_item.src = photo_url;
+                    if (view_image.checked) {
+                        photo_view.appendChild(photo_item);
+                    }
                 }
             }
 
