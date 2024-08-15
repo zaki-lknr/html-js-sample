@@ -1,5 +1,5 @@
 function save_configure() {
-    console.log("save_configure() begin");
+    // console.log("save_configure() begin");
     // get form data
     let input_token = document.getElementById("oauth_token").value;
     // console.log("oauth_token: " + input_token);
@@ -12,15 +12,15 @@ function save_configure() {
 }
 
 function load_configure() {
-    console.log("load_configure() begin");
+    // console.log("load_configure() begin");
 
     // load from local storage
     const swarm_configure = localStorage.getItem('configure');
-    console.log('configure: ' + swarm_configure);
+    // console.log('configure: ' + swarm_configure);
 
     const configure = JSON.parse(swarm_configure);
     // update page
-    console.log('token: '+ configure.oauth_token);
+    // console.log('token: '+ configure.oauth_token);
     document.getElementById("oauth_token").value = configure.oauth_token;
 
     return configure;
@@ -52,8 +52,8 @@ function load_data() {
     var display = document.getElementById("checkin_list");
     let index = 0;
     for (let checkin of checkin_data.response.checkins.items) {
-        console.log("checkin: " + checkin.venue.name);
-        console.log("createdAt: " + checkin.venue.createdAt);
+        // console.log("checkin: " + checkin.venue.name);
+        // console.log("createdAt: " + checkin.venue.createdAt);
 
         let component = document.createElement("div");
 
@@ -119,7 +119,7 @@ function load_data() {
 }
 
 async function get_shortcut_url(checkin_id) {
-    console.log("get_shortcut_url() begin: " + checkin_id);
+    // console.log("get_shortcut_url() begin: " + checkin_id);
 
     let url = await get_url(checkin_id);
     document.getElementById(checkin_id).value = url;
