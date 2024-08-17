@@ -67,7 +67,19 @@ async function post_message(session) {
         repo: configure.bsky_id,
         collection: "app.bsky.feed.post",
         record: {
-            text: message,
+            text: "Go to this site\nhttps://www.yahoo.co.jp/",
+            facets: [
+                {
+                    index: {
+                        byteStart: 16,
+                        byteEnd: 40
+                    },
+                    features: [{
+                        $type: 'app.bsky.richtext.facet#link',
+                        uri: 'https://www.yahoo.co.jp/'
+                    }]
+                }
+            ],
             createdAt: new Date().toISOString()
         }
     });
