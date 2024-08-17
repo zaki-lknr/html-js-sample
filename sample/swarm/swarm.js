@@ -44,6 +44,17 @@ async function reload_data() {
     load_data();
 }
 
+function get_image_url(disp_width, count, photo) {
+    let w = disp_width * 0.95;
+    let h = photo.height * w / photo.height;
+    if (count != 1) {
+        // さらに半分
+        w = w / 2;
+        h = h / 2;
+    }
+    return photo.prefix + Math.round(w) + 'x' + Math.round(h) + photo.suffix;
+}
+
 function load_data() {
     const checkins = localStorage.getItem('rest_response');
     // console.log('checkins: ' + checkins);
@@ -112,7 +123,7 @@ function load_data() {
             if (photo_count > 0) {
                 for (let photos of checkin.photos.items) {
                     let photo_item = document.createElement("img");
-                    let photo_url = photos.prefix + Math.round(photos.width/10) + 'x' + Math.round(photos.height/10) + photos.suffix;
+                    let photo_url = get_image_url(display.clientWidth, photo_count, photos);
                     photo_item.src = photo_url;
                     if (view_image.checked) {
                         photo_view.appendChild(photo_item);
