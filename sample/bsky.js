@@ -66,10 +66,13 @@ async function get_session() {
 async function post_message(session) {
     const configure = load_configure();
 
-    const image_url = 'https://pbs.twimg.com/media/GVGp6c2aEAAWlpD?format=jpg&name=large';
-    const image_blob = await post_image(session, image_url);
-    console.log(image_blob);
-    console.log(image_blob.mimeType);
+    const image_url = document.getElementById("image_url").value;
+    let image_blob = null;
+    if (image_url.startsWith('http')) {
+        image_blob = await post_image(session, image_url);
+        // console.log(image_blob);
+        // console.log(image_blob.mimeType);
+    }
 
     const url = "https://bsky.social/xrpc/com.atproto.repo.createRecord";
     const headers = new Headers();
@@ -85,17 +88,21 @@ async function post_message(session) {
             text: message,
             createdAt: new Date().toISOString(),
             $type: "app.bsky.feed.post",
-            embed: {
-                $type: "app.bsky.embed.images",
-                images: [
-                    {
-                        image: image_blob,
-                        alt: "sample image upload",
-                    },
-                ]
-            },
         }
     };
+
+    if (image_blob != null) {
+        // 画像指定あり
+        body.record.embed = {
+            $type: "app.bsky.embed.images",
+            images: [
+                {
+                    image: image_blob,
+                    alt: "sample image upload",
+                },
+            ]
+        }
+    }
 
     let result = search_url_pos(message);
     if (result != null) {
