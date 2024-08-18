@@ -66,6 +66,11 @@ async function get_session() {
 async function post_message(session) {
     const configure = load_configure();
 
+    const image_url = 'https://pbs.twimg.com/media/GVGp6c2aEAAWlpD?format=jpg&name=large';
+    const image_blob = await post_image(session, image_url);
+    console.log(image_blob);
+    console.log(image_blob.mimeType);
+
     const url = "https://bsky.social/xrpc/com.atproto.repo.createRecord";
     const headers = new Headers();
     headers.append('Authorization', "Bearer " + session.accessJwt);
@@ -78,13 +83,23 @@ async function post_message(session) {
         collection: "app.bsky.feed.post",
         record: {
             text: message,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            $type: "app.bsky.feed.post",
+            embed: {
+                $type: "app.bsky.embed.images",
+                images: [
+                    {
+                        image: image_blob,
+                        alt: "sample image upload",
+                    },
+                ]
+            },
         }
     };
 
     let result = search_url_pos(message);
-    console.log('start: ' + result[0] + ", end: " + result[1] + ', url: ' + result[2]);
     if (result != null) {
+        console.log('start: ' + result[0] + ", end: " + result[1] + ', url: ' + result[2]);
         // リンクあり
         body.record.facets = [
             {
@@ -105,6 +120,26 @@ async function post_message(session) {
     console.log(res.status);
     const response = await res.text();
 
+}
+
+async function post_image(session, image_url) {
+    // get image
+    const res_img = await fetch(image_url);
+    const image = await res_img.blob();
+    console.log('size: ' + image.size);
+    console.log('type: ' + image.type);
+    const buffer = await image.arrayBuffer();
+    const array = new Uint8Array(buffer);
+
+    const url = "https://bsky.social/xrpc/com.atproto.repo.uploadBlob";
+    const headers = new Headers();
+    headers.append('Authorization', "Bearer " + session.accessJwt);
+    headers.append('Content-Type', image.type);
+    
+    const res = await fetch(url, { method: "POST", body: array, headers: headers });
+    const res_json = await res.json()
+    console.log(res_json);
+    return res_json.blob;
 }
 
 function search_url_pos(message) {
