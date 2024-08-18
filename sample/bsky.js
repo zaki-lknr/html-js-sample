@@ -30,8 +30,16 @@ function load_configure() {
 async function post() {
     console.log("start")
 
-    const response = await get_session();
-    post_message(response);
+    let message = 'YouTube https://www.youtube.com/ です。';
+    // let message = 'うまれたトキメキ';
+    let result = search_url_pos(message);
+    if (result != null) {
+        console.log('start: ' + result[0]);
+        console.log('end: ' + result[1]);
+        console.log('str: ' + result[2]);
+    }
+    // const response = await get_session();
+    // post_message(response);
 }
 
 async function get_session() {
@@ -67,16 +75,16 @@ async function post_message(session) {
         repo: configure.bsky_id,
         collection: "app.bsky.feed.post",
         record: {
-            text: "Go to this site\nhttps://www.yahoo.co.jp/",
+            text: "Go to this site\nhttps://www.swarmapp.com/zaki_hmkc/ch...",
             facets: [
                 {
                     index: {
                         byteStart: 16,
-                        byteEnd: 40
+                        byteEnd: 56
                     },
                     features: [{
                         $type: 'app.bsky.richtext.facet#link',
-                        uri: 'https://www.yahoo.co.jp/'
+                        uri: 'https://www.swarmapp.com/zaki_hmkc/checkin/66bfd120fcee6c1f8ab262ae?s=KMEA746sVoFzMfjgEVPd_pyObps'
                     }]
                 }
             ],
@@ -88,4 +96,16 @@ async function post_message(session) {
     console.log(res.status);
     const response = await res.text();
 
+}
+
+function search_url_pos(message) {
+    // const start = message.indexOf('http');
+    const start = message.search('https?://');
+    // console.log(start);
+    if (start < 0) {
+        return null;
+    }
+    const match = message.match('https?://[a-zA-Z0-9/:%#\$&\?\(\)~\.=\+\-]+');
+    // console.log(match);
+    return [start, match[0].length, match[0]];
 }
