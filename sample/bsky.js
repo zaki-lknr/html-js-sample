@@ -117,7 +117,7 @@ function search_url_pos(message) {
     // バイトサイズの位置に変換
     const pos = new Blob([message.substring(0,start)]).size;
     // URL文字列長取得
-    const match = message.match('https?://[a-zA-Z0-9/:%#\$&\?\(\)~\.=\+\-]+');
+    const match = message.match('https?://[a-zA-Z0-9/:%#\$&\?\(\)~\.=\+\-_]+');
     // console.log(match);
     return [pos, (pos + match[0].length), match[0]];
 }
