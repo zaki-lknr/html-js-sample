@@ -33,6 +33,7 @@ async function post() {
     // let message = document.getElementById("post_string").value;
     // // let message = 'YouTube https://www.youtube.com/ です。';
     // // let message = 'うまれたトキメキ';
+    // let message = 'ユーチューブ https://www.youtube.com/ です';
     // let result = search_url_pos(message);
     // if (result != null) {
     //     console.log('start: ' + result[0]);
@@ -113,7 +114,10 @@ function search_url_pos(message) {
     if (start < 0) {
         return null;
     }
+    // バイトサイズの位置に変換
+    const pos = new Blob([message.substring(0,start)]).size;
+    // URL文字列長取得
     const match = message.match('https?://[a-zA-Z0-9/:%#\$&\?\(\)~\.=\+\-]+');
     // console.log(match);
-    return [start, (start + match[0].length), match[0]];
+    return [pos, (pos + match[0].length), match[0]];
 }
