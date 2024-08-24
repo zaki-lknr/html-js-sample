@@ -66,20 +66,31 @@ async function get_session() {
 async function post_message(session) {
     const configure = load_configure();
 
+    const message = document.getElementById("post_string").value;
+
+    // リンクを含むか確認
+    const url_text = search_url_pos(message);
+
+    // 添付画像URL
     const image_url = document.getElementById("image_url").value;
     let image_blob = null;
+    let ogp = null;
     if (image_url.startsWith('http')) {
         image_blob = await post_image(session, image_url);
         // console.log(image_blob);
         // console.log(image_blob.mimeType);
+    }
+    else if (url_text != null) {
+        // 添付画像はないけどURLがある場合
+        ogp = await get_ogp(url_text[2]);
+        console.log(ogp);
+        image_blob = await post_image(session, ogp['og:image']);
     }
 
     const url = "https://bsky.social/xrpc/com.atproto.repo.createRecord";
     const headers = new Headers();
     headers.append('Authorization', "Bearer " + session.accessJwt);
     headers.append('Content-Type', 'application/json');
-
-    let message = document.getElementById("post_string").value;
 
     let body = {
         repo: configure.bsky_id,
@@ -104,33 +115,31 @@ async function post_message(session) {
         }
     }
 
-    let result = search_url_pos(message);
-    if (result != null) {
-        console.log('start: ' + result[0] + ", end: " + result[1] + ', url: ' + result[2]);
+    if (url_text != null) {
+        console.log('start: ' + url_text[0] + ", end: " + url_text[1] + ', url: ' + url_text[2]);
         // リンクあり
         body.record.facets = [
             {
                 index: {
-                    byteStart: result[0],
-                    byteEnd: result[1]
+                    byteStart: url_text[0],
+                    byteEnd: url_text[1]
                 },
                 features: [{
                     $type: 'app.bsky.richtext.facet#link',
-                    uri: result[2]
+                    uri: url_text[2]
                 }]
             }
         ]
 
-        if (image_blob == null) {
-            // 画像指定がなければリンク先のOGPを指定
-            const ogp = get_ogp(result[2]);
+        if (ogp != null) {
+            // OGP情報があればその内容を表示
             body.record.embed = {
                 $type: "app.bsky.embed.external",
                 external: {
-                    uri: result[2],
+                    uri: url_text[2],
                     title: ogp['og:title'],
                     description: ogp['og:description'],
-                    // thumb: image_blob
+                    thumb: image_blob
                 }
             }
         }
@@ -183,6 +192,7 @@ async function get_ogp(url) {
     const res = await fetch(proxy_url);
     const t = await res.text();
     const d = new DOMParser().parseFromString(t, "text/html");
+    const ogp = {};
 
     for (const child of d.head.children) {
         if (child.tagName === 'META') {
