@@ -120,6 +120,20 @@ async function post_message(session) {
                 }]
             }
         ]
+
+        if (image_blob == null) {
+            // 画像指定がなければリンク先のOGPを指定
+            const ogp = get_ogp(result[2]);
+            body.record.embed = {
+                $type: "app.bsky.embed.external",
+                external: {
+                    uri: result[2],
+                    title: ogp['og:title'],
+                    description: ogp['og:description'],
+                    // thumb: image_blob
+                }
+            }
+        }
     }
 
 
@@ -162,4 +176,32 @@ function search_url_pos(message) {
     const match = message.match('https?://[a-zA-Z0-9/:%#\$&\?\(\)~\.=\+\-_]+');
     // console.log(match);
     return [pos, (pos + match[0].length), match[0]];
+}
+
+async function get_ogp(url) {
+    const proxy_url = 'https://corsproxy.io/?' + encodeURIComponent(url);
+    const res = await fetch(proxy_url);
+    const t = await res.text();
+    const d = new DOMParser().parseFromString(t, "text/html");
+
+    for (const child of d.head.children) {
+        if (child.tagName === 'META') {
+            switch (child.getAttribute('property')) {
+                case 'og:description':
+                case 'og:image':
+                case 'og:title':
+                    // console.log(child.getAttribute('property') + ': ' + child.getAttribute('content'));
+                    ogp[child.getAttribute('property')] = child.getAttribute('content');
+                    break;
+            }
+            // switch (child.getAttribute('name')) {
+            //     case 'twitter:image':
+            //     case 'twitter:title':
+            //     case 'twitter:description':
+            //         console.log(child.getAttribute('name') + ': ' + child.getAttribute('content'));
+            //         break;
+            // }
+        }
+    }
+    return ogp;
 }
