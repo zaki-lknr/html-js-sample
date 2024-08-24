@@ -21,6 +21,14 @@ async function get_ogp() {
     const d = new DOMParser().parseFromString(t, "text/html");
 
     console.log(d);
-    console.log(d.head);
+    // console.log(d.head);
     console.log(d.title);   // title
+    for (const child of d.head.children) {
+        if (child.tagName === 'META') {
+            // console.log(child);
+            if (child.getAttribute('property')?.startsWith('og:')) {
+                console.log(child);
+            }
+        }
+    }
 }
