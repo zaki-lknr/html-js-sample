@@ -69,7 +69,7 @@ async function post_message(session) {
     const message = document.getElementById("post_string").value;
 
     // リンクを含むか確認
-    const url_text = search_url_pos(message);
+    const url_obj = search_url_pos(message);
 
     // 添付画像URL
     const image_url = document.getElementById("image_url").value;
@@ -80,9 +80,9 @@ async function post_message(session) {
         // console.log(image_blob);
         // console.log(image_blob.mimeType);
     }
-    else if (url_text != null) {
+    else if (url_obj != null) {
         // 添付画像はないけどURLがある場合
-        ogp = await get_ogp(url_text[2]);
+        ogp = await get_ogp(url_obj.url);
         console.log(ogp);
         image_blob = await post_image(session, ogp['og:image']);
     }
@@ -116,18 +116,18 @@ async function post_message(session) {
         }
     }
 
-    if (url_text != null) {
-        console.log('start: ' + url_text[0] + ", end: " + url_text[1] + ', url: ' + url_text[2]);
+    if (url_obj != null) {
+        // console.log('start: ' + url_obj.start + ", end: " + url_obj.end + ', url: ' + url_obj.url);
         // リンクあり
         body.record.facets = [
             {
                 index: {
-                    byteStart: url_text[0],
-                    byteEnd: url_text[1]
+                    byteStart: url_obj.start,
+                    byteEnd: url_obj.end
                 },
                 features: [{
                     $type: 'app.bsky.richtext.facet#link',
-                    uri: url_text[2]
+                    uri: url_obj.url
                 }]
             }
         ]
@@ -137,7 +137,7 @@ async function post_message(session) {
             body.record.embed = {
                 $type: "app.bsky.embed.external",
                 external: {
-                    uri: url_text[2],
+                    uri: url_obj.url,
                     title: ogp['og:title'],
                     description: ogp['og:description'],
                     thumb: image_blob
@@ -202,7 +202,12 @@ function search_url_pos(message) {
     // URL文字列長取得
     const match = message.match('https?://[a-zA-Z0-9/:%#\$&\?\(\)~\.=\+\-_]+');
     // console.log(match);
-    return [pos, (pos + match[0].length), match[0]];
+    const result = {
+        start: pos,
+        end: pos + match[0].length,
+        url: match[0],
+    }
+    return result;
 }
 
 function search_tag_pos(message) {
