@@ -70,6 +70,7 @@ async function post_message(session) {
 
     // リンクを含むか確認
     const url_obj = search_url_pos(message);
+    const update_msg = ('short' in url_obj)? url_obj.short.message: message;
 
     // 添付画像URL
     const image_url = document.getElementById("image_url").value;
@@ -96,7 +97,7 @@ async function post_message(session) {
         repo: configure.bsky_id,
         collection: "app.bsky.feed.post",
         record: {
-            text: message,
+            text: update_msg,
             createdAt: new Date().toISOString(),
             $type: "app.bsky.feed.post",
             facets: [],
@@ -123,7 +124,7 @@ async function post_message(session) {
             {
                 index: {
                     byteStart: url_obj.start,
-                    byteEnd: url_obj.end
+                    byteEnd: ('short' in url_obj)? url_obj.start + url_obj.short.len: url_obj.end,
                 },
                 features: [{
                     $type: 'app.bsky.richtext.facet#link',
@@ -145,8 +146,9 @@ async function post_message(session) {
             }
         }
     }
+    console.log(body);
 
-    const tags = search_tag_pos(message);
+    const tags = search_tag_pos(update_msg);
     if (tags != null) {
         for (const tag of tags) {
             // hashtagがある場合
@@ -202,10 +204,23 @@ function search_url_pos(message) {
     // URL文字列長取得
     const match = message.match('https?://[a-zA-Z0-9/:%#\$&\?\(\)~\.=\+\-_]+');
     // console.log(match);
+    // 長いURLを短縮
+    const url_obj = new URL(match[0]);
+    const short = {};
+    if (match[0].length - url_obj.origin.length > 15) {
+        const short_url = match[0].substring(0, url_obj.origin.length + 15) + '...';
+        short.url = short_url;
+        short.len = short_url.length;
+        short.message = message.substring(0, start) + short_url + message.substring(start + match[0].length);
+    }
+
     const result = {
         start: pos,
         end: pos + match[0].length,
         url: match[0],
+    }
+    if (Object.keys(short).length != 0) {
+        result.short = short;
     }
     return result;
 }
