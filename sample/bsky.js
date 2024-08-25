@@ -174,7 +174,7 @@ async function post_message(session) {
 
 async function post_image(session, image_url) {
     // get image
-    const res_img = await fetch(image_url);
+    const res_img = await fetch('https://corsproxy.io/?' + encodeURIComponent(image_url));
     const image = await res_img.blob();
     // console.log('size: ' + image.size);
     // console.log('type: ' + image.type);
