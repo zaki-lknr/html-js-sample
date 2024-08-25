@@ -28,7 +28,7 @@ function load_configure() {
 }
 
 async function post() {
-    console.log("start")
+    // console.log("start")
 
     // let message = document.getElementById("post_string").value;
     // // let message = 'YouTube https://www.youtube.com/ です。';
@@ -84,7 +84,7 @@ async function post_message(session) {
     else if (url_obj != null) {
         // 添付画像はないけどURLがある場合
         ogp = await get_ogp(url_obj.url);
-        console.log(ogp);
+        // console.log(ogp);
         image_blob = await post_image(session, ogp['og:image']);
     }
 
@@ -146,7 +146,7 @@ async function post_message(session) {
             }
         }
     }
-    console.log(body);
+    // console.log(body);
 
     const tags = search_tag_pos(update_msg);
     if (tags != null) {
@@ -167,7 +167,7 @@ async function post_message(session) {
 
 
     const res = await fetch(url, { method: "POST", body: JSON.stringify(body), headers: headers });
-    console.log(res.status);
+    // console.log(res.status);
     const response = await res.text();
 
 }
@@ -176,8 +176,8 @@ async function post_image(session, image_url) {
     // get image
     const res_img = await fetch(image_url);
     const image = await res_img.blob();
-    console.log('size: ' + image.size);
-    console.log('type: ' + image.type);
+    // console.log('size: ' + image.size);
+    // console.log('type: ' + image.type);
     const buffer = await image.arrayBuffer();
     const array = new Uint8Array(buffer);
 
@@ -188,7 +188,7 @@ async function post_image(session, image_url) {
     
     const res = await fetch(url, { method: "POST", body: array, headers: headers });
     const res_json = await res.json()
-    console.log(res_json);
+    // console.log(res_json);
     return res_json.blob;
 }
 
