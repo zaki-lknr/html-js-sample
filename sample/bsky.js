@@ -99,6 +99,7 @@ async function post_message(session) {
             text: message,
             createdAt: new Date().toISOString(),
             $type: "app.bsky.feed.post",
+            facets: [],
         }
     };
 
@@ -145,6 +146,23 @@ async function post_message(session) {
         }
     }
 
+    const tags = search_tag_pos(message);
+    if (tags != null) {
+        for (const tag of tags) {
+            // hashtagがある場合
+            body.record.facets.push({
+                index: {
+                    byteStart: tag.start,
+                    byteEnd: tag.end
+                },
+                features: [{
+                    $type: 'app.bsky.richtext.facet#tag',
+                    tag: tag.tag.replace(/^#/, ''),
+                }]
+            });
+        }
+    }
+
 
     const res = await fetch(url, { method: "POST", body: JSON.stringify(body), headers: headers });
     console.log(res.status);
@@ -185,6 +203,24 @@ function search_url_pos(message) {
     const match = message.match('https?://[a-zA-Z0-9/:%#\$&\?\(\)~\.=\+\-_]+');
     // console.log(match);
     return [pos, (pos + match[0].length), match[0]];
+}
+
+function search_tag_pos(message) {
+    const result = [];
+    const regex = RegExp(/\#\S+/, 'g');
+    let e;
+    while (e = regex.exec(message)) {
+        const tag = message.substring(e.index, e.index + e[0].length);
+        const start = new Blob([message.substring(0, e.index)]).size;
+        const end = start + new Blob([tag]).size;
+        const item = {
+            start: start,
+            end: end,
+            tag: tag,
+        }
+        result.push(item);
+    }
+    return result;
 }
 
 async function get_ogp(url) {
