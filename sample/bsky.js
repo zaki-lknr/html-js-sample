@@ -58,6 +58,9 @@ async function get_session() {
     });
 
     const res = await fetch(url, { method: "POST", body: body, headers: headers });
+    if (!res.ok) {
+        throw new Error('com.atproto.server.createSession failed: ' + await res.text());
+    }
 
     const response = await res.json();
     return response;
@@ -167,7 +170,9 @@ async function post_message(session) {
 
 
     const res = await fetch(url, { method: "POST", body: JSON.stringify(body), headers: headers });
-    // console.log(res.status);
+    if (!res.ok) {
+        throw new Error(url + ': ' + await res.text());
+    }
     const response = await res.text();
 
 }
@@ -175,6 +180,9 @@ async function post_message(session) {
 async function post_image(session, image_url) {
     // get image
     const res_img = await fetch('https://corsproxy.io/?' + encodeURIComponent(image_url));
+    if (!res_img.ok) {
+        throw new Error('https://corsproxy.io/?' + encodeURIComponent(image_url) + ': ' + await res_img.text());
+    }
     const image = await res_img.blob();
     // console.log('size: ' + image.size);
     // console.log('type: ' + image.type);
@@ -187,6 +195,9 @@ async function post_image(session, image_url) {
     headers.append('Content-Type', image.type);
     
     const res = await fetch(url, { method: "POST", body: array, headers: headers });
+    if (!res.ok) {
+        throw new Error('https://bsky.social/xrpc/com.atproto.repo.uploadBlob: ' + await res.text());
+    }
     const res_json = await res.json()
     // console.log(res_json);
     return res_json.blob;
@@ -246,6 +257,9 @@ function search_tag_pos(message) {
 async function get_ogp(url) {
     const proxy_url = 'https://corsproxy.io/?' + encodeURIComponent(url);
     const res = await fetch(proxy_url);
+    if (!res.ok) {
+        throw new Error('https://corsproxy.io/?' + encodeURIComponent(url) + ': ' + await res.text());
+    }
     const t = await res.text();
     const d = new DOMParser().parseFromString(t, "text/html");
     const ogp = {};
