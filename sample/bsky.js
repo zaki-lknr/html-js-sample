@@ -1,6 +1,6 @@
 function save_configure() {
-    let bsky_id = document.getElementById("bsky_id").value;
-    let bsky_pass = document.getElementById("bsky_pass").value;
+    const bsky_id = document.getElementById("bsky_id").value;
+    const bsky_pass = document.getElementById("bsky_pass").value;
 
     const zzz_configuration = {
         bsky_id: bsky_id,
@@ -96,7 +96,7 @@ async function post_message(session) {
     headers.append('Authorization', "Bearer " + session.accessJwt);
     headers.append('Content-Type', 'application/json');
 
-    let body = {
+    const body = {
         repo: configure.bsky_id,
         collection: "app.bsky.feed.post",
         record: {
