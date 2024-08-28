@@ -31,6 +31,7 @@ async function post() {
     // console.log("start")
     const configure = load_configure();
     const message = document.getElementById("post_string").value;
+    const image_url = document.getElementById("image_url").value;
 
     // let message = document.getElementById("post_string").value;
     // // let message = 'YouTube https://www.youtube.com/ です。';
@@ -43,7 +44,7 @@ async function post() {
     //     console.log('str: ' + result[2]);
     // }
     const response = await get_session(configure.bsky_id, configure.bsky_pass);
-    post_message(message, response, configure.bsky_id);
+    post_message(message, image_url, response, configure.bsky_id);
 }
 
 async function get_session(bsky_id, bsky_pass) {
@@ -67,13 +68,12 @@ async function get_session(bsky_id, bsky_pass) {
     return response;
 }
 
-async function post_message(message, session, bsky_id) {
+async function post_message(message, image_url, session, bsky_id) {
     // リンクを含むか確認
     const url_obj = search_url_pos(message);
     const update_msg = ('short' in url_obj)? url_obj.short.message: message;
 
     // 添付画像URL
-    const image_url = document.getElementById("image_url").value;
     let image_blob = null;
     let ogp = null;
     if (image_url.startsWith('http')) {
