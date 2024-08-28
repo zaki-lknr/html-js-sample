@@ -71,7 +71,7 @@ async function get_session(bsky_id, bsky_pass) {
 async function post_message(message, image_url, session, bsky_id) {
     // リンクを含むか確認
     const url_obj = search_url_pos(message);
-    const update_msg = ('short' in url_obj)? url_obj.short.message: message;
+    const update_msg = (url_obj != null && 'short' in url_obj)? url_obj.short.message: message;
 
     // 添付画像URL
     let image_blob = null;
