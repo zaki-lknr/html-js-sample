@@ -29,6 +29,7 @@ function load_configure() {
 
 async function post() {
     // console.log("start")
+    const configure = load_configure();
 
     // let message = document.getElementById("post_string").value;
     // // let message = 'YouTube https://www.youtube.com/ です。';
@@ -40,12 +41,11 @@ async function post() {
     //     console.log('end: ' + result[1]);
     //     console.log('str: ' + result[2]);
     // }
-    const response = await get_session();
-    post_message(response);
+    const response = await get_session(configure.bsky_id, configure.bsky_pass);
+    post_message(response, configure.bsky_id);
 }
 
-async function get_session() {
-    const configure = load_configure();
+async function get_session(bsky_id, bsky_pass) {
 
     // create session
     const url = "https://bsky.social/xrpc/com.atproto.server.createSession";
@@ -53,8 +53,8 @@ async function get_session() {
     headers.append('Content-Type', 'application/json');
 
     const body = JSON.stringify({
-        identifier: configure.bsky_id,
-        password: configure.bsky_pass
+        identifier: bsky_id,
+        password: bsky_pass
     });
 
     const res = await fetch(url, { method: "POST", body: body, headers: headers });
@@ -66,9 +66,7 @@ async function get_session() {
     return response;
 }
 
-async function post_message(session) {
-    const configure = load_configure();
-
+async function post_message(session, bsky_id) {
     const message = document.getElementById("post_string").value;
 
     // リンクを含むか確認
@@ -97,7 +95,7 @@ async function post_message(session) {
     headers.append('Content-Type', 'application/json');
 
     const body = {
-        repo: configure.bsky_id,
+        repo: bsky_id,
         collection: "app.bsky.feed.post",
         record: {
             text: update_msg,
