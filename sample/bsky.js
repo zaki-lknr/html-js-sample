@@ -77,7 +77,7 @@ async function post_message(message, image_url, session, bsky_id) {
     let image_blob = null;
     let ogp = null;
     if (image_url.startsWith('http')) {
-        image_blob = await post_image(session, image_url);
+        image_blob = await post_image(session, null, image_url);
         // console.log(image_blob);
         // console.log(image_blob.mimeType);
     }
@@ -85,7 +85,7 @@ async function post_message(message, image_url, session, bsky_id) {
         // 添付画像はないけどURLがある場合
         ogp = await get_ogp(url_obj.url);
         // console.log(ogp);
-        image_blob = await post_image(session, ogp['og:image']);
+        image_blob = await post_image(session, null, ogp['og:image']);
     }
 
     const url = "https://bsky.social/xrpc/com.atproto.repo.createRecord";
@@ -174,24 +174,35 @@ async function post_message(message, image_url, session, bsky_id) {
 
 }
 
-async function post_image(session, image_url) {
-    // get image
-    const res_img = await fetch('https://corsproxy.io/?' + encodeURIComponent(image_url));
-    if (!res_img.ok) {
-        throw new Error('https://corsproxy.io/?' + encodeURIComponent(image_url) + ': ' + await res_img.text());
+async function post_image(session, image_file, image_url) {
+    let image_blob;
+    let image_type;
+
+    if (image_file != null) {
     }
-    const image = await res_img.blob();
-    // console.log('size: ' + image.size);
-    // console.log('type: ' + image.type);
-    const buffer = await image.arrayBuffer();
-    const array = new Uint8Array(buffer);
+    else {
+        // get image
+        const res_img = await fetch('https://corsproxy.io/?' + encodeURIComponent(image_url));
+        if (!res_img.ok) {
+            throw new Error('https://corsproxy.io/?' + encodeURIComponent(image_url) + ': ' + await res_img.text());
+        }
+        const image = await res_img.blob();
+        // console.log('size: ' + image.size);
+        // console.log('type: ' + image.type);
+        const buffer = await image.arrayBuffer();
+        image_blob = new Uint8Array(buffer);
+        image_type = image.type;
+    }
+
+    // const inputfile = document.getElementById("file").files[0];
+    // console.log(inputfile);
 
     const url = "https://bsky.social/xrpc/com.atproto.repo.uploadBlob";
     const headers = new Headers();
     headers.append('Authorization', "Bearer " + session.accessJwt);
-    headers.append('Content-Type', image.type);
+    headers.append('Content-Type', image_type);
     
-    const res = await fetch(url, { method: "POST", body: array, headers: headers });
+    const res = await fetch(url, { method: "POST", body: image_blob, headers: headers });
     if (!res.ok) {
         throw new Error('https://bsky.social/xrpc/com.atproto.repo.uploadBlob: ' + await res.text());
     }
