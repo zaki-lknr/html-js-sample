@@ -101,6 +101,7 @@ async function post_message(message, image_url, session, bsky_id) {
             createdAt: new Date().toISOString(),
             $type: "app.bsky.feed.post",
             facets: [],
+            via: 'NJGK'
         }
     };
 
