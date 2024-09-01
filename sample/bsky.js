@@ -32,6 +32,7 @@ async function post() {
     const configure = load_configure();
     const message = document.getElementById("post_string").value;
     const image_url = document.getElementById("image_url").value;
+    const local_image = document.getElementById("file").files[0];
 
     // let message = document.getElementById("post_string").value;
     // // let message = 'YouTube https://www.youtube.com/ です。';
@@ -44,7 +45,7 @@ async function post() {
     //     console.log('str: ' + result[2]);
     // }
     const response = await get_session(configure.bsky_id, configure.bsky_pass);
-    post_message(message, image_url, response, configure.bsky_id);
+    post_message(message, local_image, image_url, response, configure.bsky_id);
 }
 
 async function get_session(bsky_id, bsky_pass) {
@@ -68,15 +69,18 @@ async function get_session(bsky_id, bsky_pass) {
     return response;
 }
 
-async function post_message(message, image_url, session, bsky_id) {
+async function post_message(message, local_image, image_url, session, bsky_id) {
     // リンクを含むか確認
     const url_obj = search_url_pos(message);
     const update_msg = (url_obj != null && 'short' in url_obj)? url_obj.short.message: message;
 
     // 添付画像URL
-    let image_blob = null;
+    let imabe_blob = null;
     let ogp = null;
-    if (image_url.startsWith('http')) {
+    if (local_image != null) {
+        image_blob = await post_image(session, local_image, null);
+    }
+    else if (image_url.startsWith('http')) {
         image_blob = await post_image(session, null, image_url);
         // console.log(image_blob);
         // console.log(image_blob.mimeType);
@@ -180,6 +184,8 @@ async function post_image(session, image_file, image_url) {
     let image_type;
 
     if (image_file != null) {
+        image_blob = image_file;
+        image_type = image_file.type;
     }
     else {
         // get image
@@ -188,15 +194,10 @@ async function post_image(session, image_file, image_url) {
             throw new Error('https://corsproxy.io/?' + encodeURIComponent(image_url) + ': ' + await res_img.text());
         }
         const image = await res_img.blob();
-        // console.log('size: ' + image.size);
-        // console.log('type: ' + image.type);
         const buffer = await image.arrayBuffer();
         image_blob = new Uint8Array(buffer);
         image_type = image.type;
     }
-
-    // const inputfile = document.getElementById("file").files[0];
-    // console.log(inputfile);
 
     const url = "https://bsky.social/xrpc/com.atproto.repo.uploadBlob";
     const headers = new Headers();
