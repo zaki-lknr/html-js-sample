@@ -71,8 +71,9 @@ async function get_session(bsky_id, bsky_pass) {
 
 async function post_message(message, local_image, image_url, session, bsky_id) {
     // リンクを含むか確認
-    const url_obj = search_url_pos(message);
-    const update_msg = (url_obj != null && 'short' in url_obj)? url_obj.short.message: message;
+    const url_objs = search_url_pos(message);
+    console.log(url_objs);
+    const update_msg = (url_objs != null)? url_objs[0].disp_message: message;
 
     // 添付画像URL
     let imabe_blob = null;
@@ -85,9 +86,9 @@ async function post_message(message, local_image, image_url, session, bsky_id) {
         // console.log(image_blob);
         // console.log(image_blob.mimeType);
     }
-    else if (url_obj != null) {
+    else if (url_objs != null) {
         // 添付画像はないけどURLがある場合
-        ogp = await get_ogp(url_obj.url);
+        ogp = await get_ogp(url_objs[0].url);
         // console.log(ogp);
         image_blob = await post_image(session, null, ogp['og:image']);
     }
@@ -122,28 +123,29 @@ async function post_message(message, local_image, image_url, session, bsky_id) {
         }
     }
 
-    if (url_obj != null) {
-        // console.log('start: ' + url_obj.start + ", end: " + url_obj.end + ', url: ' + url_obj.url);
+    if (url_objs != null) {
         // リンクあり
-        body.record.facets = [
-            {
+        body.record.facets = [];
+        for (const item of url_objs) {
+            const facet = {
                 index: {
-                    byteStart: url_obj.start,
-                    byteEnd: ('short' in url_obj)? url_obj.start + url_obj.short.len: url_obj.end,
+                    byteStart: item.start,
+                    byteEnd: item.end,
                 },
                 features: [{
                     $type: 'app.bsky.richtext.facet#link',
-                    uri: url_obj.url
+                    uri: item.url
                 }]
             }
-        ]
+            body.record.facets.push(facet);
+        }
 
         if (ogp != null) {
             // OGP情報があればその内容を表示
             body.record.embed = {
                 $type: "app.bsky.embed.external",
                 external: {
-                    uri: url_obj.url,
+                    uri: url_objs[0].url,
                     title: ogp['og:title'],
                     description: ogp['og:description'],
                     thumb: image_blob
@@ -213,37 +215,49 @@ async function post_image(session, image_file, image_url) {
     return res_json.blob;
 }
 
-function search_url_pos(message) {
-    // const start = message.indexOf('http');
-    const start = message.search('https?://');
-    // console.log(start);
-    if (start < 0) {
+function search_url_pos(message, start_pos = 0) {
+    // const url_pos = message.indexOf('http');
+    const url_pos = message.search('https?://');
+    console.log(message);
+    console.log(url_pos);
+    if (url_pos < 0) {
         return null;
     }
     // バイトサイズの位置に変換
-    const pos = new Blob([message.substring(0,start)]).size;
+    const byte_pos = new Blob([message.substring(0,url_pos)]).size;
     // URL文字列長取得
     const match = message.match('https?://[a-zA-Z0-9/:%#\$&\?\(\)~\.=\+\-_]+');
     // console.log(match);
+
     // 長いURLを短縮
     const url_obj = new URL(match[0]);
-    const short = {};
-    if (match[0].length - url_obj.origin.length > 15) {
-        const short_url = match[0].substring(0, url_obj.origin.length + 15) + '...';
-        short.url = short_url;
-        short.len = short_url.length;
-        short.message = message.substring(0, start) + short_url + message.substring(start + match[0].length);
+    console.log(url_obj);
+    let disp_url = url_obj.href;
+
+    // const short = {};
+    if (url_obj.href.length - url_obj.origin.length > 15) {
+        disp_url = url_obj.href.substring(0, url_obj.origin.length + 15) + '...';
     }
 
-    const result = {
-        start: pos,
-        end: pos + match[0].length,
-        url: match[0],
+    const remain = message.substring(url_pos + url_obj.href.length);
+    const next = search_url_pos(remain, byte_pos + disp_url.length + start_pos);
+    console.log('next: ' + next);
+    if (next != null) {
+        console.log(next);
     }
-    if (Object.keys(short).length != 0) {
-        result.short = short;
+    disp_message = message.substring(0, url_pos) + disp_url + ((next!=null)? next[0].disp_message: message.substring(url_pos + url_obj.href.length));
+
+    const results = [{
+        start: byte_pos + start_pos,
+        end: byte_pos + disp_url.length + start_pos,
+        url: url_obj.href,
+        disp_url: disp_url,
+        disp_message: disp_message,
+    }]
+    if (next != null) {
+        results.push(...next);
     }
-    return result;
+    return results;
 }
 
 function search_tag_pos(message) {
