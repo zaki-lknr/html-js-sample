@@ -56,6 +56,9 @@ function get_image_url(disp_width, count, photo) {
 }
 
 function load_data() {
+    // title version
+    document.getElementById('title').textContent = 'swarm c2c ver.0904';
+
     const checkins = localStorage.getItem('rest_response');
     // console.log('checkins: ' + checkins);
     if (checkins === null) {
@@ -161,10 +164,11 @@ async function get_shortcut_url(checkin_id) {
     let url = await get_url(checkin_id);
     document.getElementById(checkin_id).value = url;
 
-    let comment = document.getElementById(checkin_id + '_comment').textContent;
-    comment += "\n" + url;
+    const comment = document.getElementById(checkin_id + '_comment').textContent;
+    const share_comment = comment + "\n" + url;
     console.log(comment);
-    navigator.clipboard.writeText(comment);
+    navigator.clipboard.writeText(share_comment);
+    window.open('https://x.com/intent/tweet?url=' + url + '&text=' + encodeURIComponent(comment));
 }
 
 async function get_url(checkin_id) {
