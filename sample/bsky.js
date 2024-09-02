@@ -72,11 +72,11 @@ async function get_session(bsky_id, bsky_pass) {
 async function post_message(message, local_image, image_url, session, bsky_id) {
     // リンクを含むか確認
     const url_objs = search_url_pos(message);
-    console.log(url_objs);
+    // console.log(url_objs);
     const update_msg = (url_objs != null)? url_objs[0].disp_message: message;
 
     // 添付画像URL
-    let imabe_blob = null;
+    let image_blob = null;
     let ogp = null;
     if (local_image != null) {
         image_blob = await post_image(session, local_image, null);
@@ -174,6 +174,7 @@ async function post_message(message, local_image, image_url, session, bsky_id) {
 
 
     const res = await fetch(url, { method: "POST", body: JSON.stringify(body), headers: headers });
+    console.log('posting... ' + res.status);
     if (!res.ok) {
         throw new Error(url + ': ' + await res.text());
     }
@@ -218,8 +219,6 @@ async function post_image(session, image_file, image_url) {
 function search_url_pos(message, start_pos = 0) {
     // const url_pos = message.indexOf('http');
     const url_pos = message.search('https?://');
-    console.log(message);
-    console.log(url_pos);
     if (url_pos < 0) {
         return null;
     }
@@ -231,7 +230,6 @@ function search_url_pos(message, start_pos = 0) {
 
     // 長いURLを短縮
     const url_obj = new URL(match[0]);
-    console.log(url_obj);
     let disp_url = url_obj.href;
 
     // const short = {};
@@ -241,11 +239,7 @@ function search_url_pos(message, start_pos = 0) {
 
     const remain = message.substring(url_pos + url_obj.href.length);
     const next = search_url_pos(remain, byte_pos + disp_url.length + start_pos);
-    console.log('next: ' + next);
-    if (next != null) {
-        console.log(next);
-    }
-    disp_message = message.substring(0, url_pos) + disp_url + ((next!=null)? next[0].disp_message: message.substring(url_pos + url_obj.href.length));
+    const disp_message = message.substring(0, url_pos) + disp_url + ((next!=null)? next[0].disp_message: message.substring(url_pos + url_obj.href.length));
 
     const results = [{
         start: byte_pos + start_pos,
