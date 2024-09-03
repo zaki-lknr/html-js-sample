@@ -109,7 +109,7 @@ function load_data() {
             rest_button.textContent = "get url";
             // rest_button.onclick = 'get_shortcut_url()'; // 効かない
             rest_button.addEventListener('click', ()=> {
-                get_shortcut_url(checkin.id);
+                get_shortcut_url(checkin);
             });
             header_part.appendChild(rest_button);
 
@@ -139,20 +139,24 @@ function load_data() {
     }
 }
 
-function create_share_string(checkin) {
+function create_share_string(checkin, twitter_id = null) {
     let location_str = '';
     let return_string;
+    let twitter_string = '';
     // formattedAddressが無いヴェニューもある
     if ('formattedAddress' in checkin.venue.location) {
         const location = ('address' in checkin.venue.location)? 1: 0;
         location_str = ' in ' + checkin.venue.location.formattedAddress[location];
     }
+    if (twitter_id) {
+        twitter_string = ' - @' + twitter_id;
+    }
 
     if ('shout' in checkin) {
-        return_string = checkin.shout + ' (@ ' + checkin.venue.name + location_str + ')';
+        return_string = checkin.shout + ' (@ ' + checkin.venue.name + twitter_string + location_str + ')';
     }
     else {
-        return_string = "I'm at " + checkin.venue.name + location_str;
+        return_string = "I'm at " + checkin.venue.name + twitter_string + location_str;
     }
 
     return return_string;
@@ -170,32 +174,34 @@ function clear_data() {
     }
 }
 
-async function get_shortcut_url(checkin_id) {
+async function get_shortcut_url(checkin) {
     // console.log("get_shortcut_url() begin: " + checkin_id);
 
-    let url = await get_url(checkin_id);
-    document.getElementById(checkin_id).value = url;
+    const detail = await get_detail(checkin.id);
+    document.getElementById(checkin.id).value = detail.url;
+    console.log(checkin);
 
-    const comment = document.getElementById(checkin_id + '_comment').textContent;
-    const share_comment = comment + "\n" + url;
+    // const comment = document.getElementById(checkin.id + '_comment').textContent;
+    const comment = create_share_string(checkin, detail.social?.twitter);
+    const share_comment = comment + "\n" + detail.url;
     console.log(comment);
     navigator.clipboard.writeText(share_comment);
-    window.open('https://x.com/intent/tweet?url=' + url + '&text=' + encodeURIComponent(comment));
+    window.open('https://x.com/intent/tweet?url=' + detail.url + '&text=' + encodeURIComponent(comment));
 }
 
-async function get_url(checkin_id) {
+async function get_detail(checkin_id) {
     const checkins = localStorage.getItem('rest_response');
     // console.log('checkins: ' + checkins);
     const checkin_data = JSON.parse(checkins);
 
-    let shortcut_url;
+    const result = {};
     for (let checkin of checkin_data.response.checkins.items) {
         // console.log('saved checkin id: ' + checkin.id);
         if (checkin_id === checkin.id) {
             // consolog.log('checkin id: ' + checkin_id);
             if ('checkinShortUrl' in checkin) {
                 console.log('shortcut url is exist');
-                shortcut_url = checkin.checkinShortUrl;
+                result.url = checkin.checkinShortUrl;
             }
             else {
                 console.log('shortcut url is not exist');
@@ -210,13 +216,13 @@ async function get_url(checkin_id) {
                 const response = await res.json();
                 // console.log(response.response.checkin.checkinShortUrl);
             
-                shortcut_url = response.response.checkin.checkinShortUrl;
-
-                checkin.checkinShortUrl = shortcut_url;
+                result.url = response.response.checkin.checkinShortUrl;
+                checkin.checkinShortUrl = response.response.checkin.checkinShortUrl;
             }
             if ('venueInfo' in checkin) {
                 // 追加情報あり(または取得済み未設定)
                 // console.log('already exist');
+                result.social = {twitter: checkin.venueInfo.twitter};
             }
             else if (!checkin.venue.private && !checkin.venue.closed) {
                 // 取得
@@ -230,16 +236,18 @@ async function get_url(checkin_id) {
                 const response = await res.json();
                 console.log(response.social_media.twitter);
 
+                result.social = {twitter: response.social_media.twitter};
                 checkin.venueInfo = {twitter: response.social_media.twitter};
             }
             else {
                 // console.log('private or obsolete');
-                checkin.venueInfo = {};
+                result.social = {};
+                checkin.venueInfo = {twitter: response.social_media.twitter};
             }
             break;
         }
     }
     localStorage.setItem('rest_response', JSON.stringify(checkin_data));
 
-    return shortcut_url;
+    return result;
 }
