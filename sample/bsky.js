@@ -154,6 +154,10 @@ async function post_message(message, local_image, image_url, session, bsky_id) {
         }
     }
     // console.log(body);
+    // if (message.search('@3rdhakatadaruma')) {
+    //     const f = get_url_facet(message, '@3rdhakatadaruma', 'https://x.com/3rdhakatadaruma');
+    //     body.record.facets.push(f);
+    // }
 
     const tags = search_tag_pos(update_msg);
     if (tags != null) {
@@ -214,6 +218,25 @@ async function post_image(session, image_file, image_url) {
     const res_json = await res.json()
     // console.log(res_json);
     return res_json.blob;
+}
+
+function get_url_facet(message, substring, url) {
+    const pos = message.search(substring);
+    // バイトサイズの位置に変換
+    const start_pos_b = new Blob([message.substring(0, pos)]).size;
+    const end_pos_b = new Blob([substring]).size;
+
+    const facet = {
+        index: {
+            byteStart: start_pos_b,
+            byteEnd: start_pos_b + end_pos_b,
+        },
+        features: [{
+            $type: 'app.bsky.richtext.facet#link',
+            uri: url
+        }]
+    }
+    return facet;
 }
 
 function search_url_pos(message, start_pos = 0) {
