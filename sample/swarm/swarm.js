@@ -86,18 +86,8 @@ function load_data() {
             let venue_name = document.createElement("div");
             venue_name.id = checkin.id + '_comment';
 
-            let location_str = '';
-            // formattedAddressが無いヴェニューもある
-            if ('formattedAddress' in checkin.venue.location) {
-                const location = ('address' in checkin.venue.location)? 1: 0;
-                location_str = ' in ' + checkin.venue.location.formattedAddress[location];
-            }
-            if ('shout' in checkin) {
-                venue_name.textContent = checkin.shout + ' (@ ' + checkin.venue.name + location_str + ')';
-            }
-            else {
-                venue_name.textContent = "I'm at " + checkin.venue.name + location_str;
-            }
+            venue_name.textContent = create_share_string(checkin);
+
             let form_part = document.createElement("div");
             let url_input = document.createElement("input");
             url_input.type = 'text';
@@ -147,6 +137,25 @@ function load_data() {
             display.appendChild(component);
         }
     }
+}
+
+function create_share_string(checkin) {
+    let location_str = '';
+    let return_string;
+    // formattedAddressが無いヴェニューもある
+    if ('formattedAddress' in checkin.venue.location) {
+        const location = ('address' in checkin.venue.location)? 1: 0;
+        location_str = ' in ' + checkin.venue.location.formattedAddress[location];
+    }
+
+    if ('shout' in checkin) {
+        return_string = checkin.shout + ' (@ ' + checkin.venue.name + location_str + ')';
+    }
+    else {
+        return_string = "I'm at " + checkin.venue.name + location_str;
+    }
+
+    return return_string;
 }
 
 function clear_data() {
