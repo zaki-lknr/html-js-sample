@@ -204,8 +204,30 @@ async function get_url(checkin_id) {
                 shortcut_url = response.response.checkin.checkinShortUrl;
 
                 checkin.checkinShortUrl = shortcut_url;
-                break;
             }
+            if ('venueInfo' in checkin) {
+                // 追加情報あり(または取得済み未設定)
+                // console.log('already exist');
+            }
+            else if (!checkin.venue.private && !checkin.venue.closed) {
+                // 取得
+                console.log("get place info");
+                const configure = load_configure();
+                const url = 'https://api.foursquare.com/v3/places/' + checkin.venue.id + '?fields=social_media';
+                const headers = new Headers();
+                headers.append('accept', 'application/json');
+                headers.append('Authorization', configure.api_key);
+                const res = await fetch(url, { headers: headers });
+                const response = await res.json();
+                console.log(response.social_media.twitter);
+
+                checkin.venueInfo = {twitter: response.social_media.twitter};
+            }
+            else {
+                // console.log('private or obsolete');
+                checkin.venueInfo = {};
+            }
+            break;
         }
     }
     localStorage.setItem('rest_response', JSON.stringify(checkin_data));
