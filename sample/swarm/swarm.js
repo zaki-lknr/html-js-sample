@@ -1,11 +1,13 @@
 function save_configure() {
     // console.log("save_configure() begin");
     // get form data
-    let input_token = document.getElementById("oauth_token").value;
+    const input_token = document.getElementById("oauth_token").value;
+    const input_apikey = document.getElementById("api_key").value;
     // console.log("oauth_token: " + input_token);
 
     const swarm_configure = {
-        oauth_token: input_token
+        oauth_token: input_token,
+        api_key: input_apikey
     }
     // save to local storage
     localStorage.setItem('configure', JSON.stringify(swarm_configure));
@@ -22,6 +24,7 @@ function load_configure() {
     // update page
     // console.log('token: '+ configure.oauth_token);
     document.getElementById("oauth_token").value = configure.oauth_token;
+    document.getElementById("api_key").value = configure.api_key;
 
     return configure;
 }
