@@ -89,8 +89,9 @@ async function post_message(message, local_image, image_url, session, bsky_id) {
     else if (url_objs != null) {
         // 添付画像はないけどURLがある場合
         ogp = await get_ogp(url_objs[0].url);
-        // console.log(ogp);
-        image_blob = await post_image(session, null, ogp['og:image']);
+        if (ogp['og:image']) {
+            image_blob = await post_image(session, null, ogp['og:image']);
+        }
     }
 
     const url = "https://bsky.social/xrpc/com.atproto.repo.createRecord";
@@ -146,10 +147,13 @@ async function post_message(message, local_image, image_url, session, bsky_id) {
                 $type: "app.bsky.embed.external",
                 external: {
                     uri: url_objs[0].url,
-                    title: ogp['og:title'],
-                    description: ogp['og:description'],
-                    thumb: image_blob
+                    title: ogp['title'],
+                    description: ogp['og:description'] || "",
                 }
+            }
+            if (image_blob) {
+                // 画像がある場合のみ追加 (無い場合は省略)
+                body.record.embed.external.thumb = image_blob;
             }
         }
     }
@@ -303,7 +307,7 @@ async function get_ogp(url) {
     }
     const t = await res.text();
     const d = new DOMParser().parseFromString(t, "text/html");
-    const ogp = {};
+    const ogp = {title: d.title};
 
     for (const child of d.head.children) {
         if (child.tagName === 'META') {
