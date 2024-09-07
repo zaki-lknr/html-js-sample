@@ -4,34 +4,38 @@ function save_configure() {
     const input_token = document.getElementById("oauth_token").value;
     const input_apikey = document.getElementById("api_key").value;
     // console.log("oauth_token: " + input_token);
+    const view_image = document.getElementById("view_image").checked;
 
-    const swarm_configure = {
-        oauth_token: input_token,
-        api_key: input_apikey
+    const configure = {
+        app: {
+            view_image: view_image,
+        },
+        swarm: {
+            oauth_token: input_token,
+            api_key: input_apikey,
+        }
     }
+    console.log(configure);
     // save to local storage
-    localStorage.setItem('configure', JSON.stringify(swarm_configure));
+    localStorage.setItem('configure', JSON.stringify(configure));
 }
 
 function load_configure() {
     // console.log("load_configure() begin");
 
-    // load from local storage
-    const swarm_configure = localStorage.getItem('configure');
-    // console.log('configure: ' + swarm_configure);
-
-    const configure = JSON.parse(swarm_configure);
+    const configure = JSON.parse(localStorage.getItem('configure'));
     // update page
     // console.log('token: '+ configure.oauth_token);
-    document.getElementById("oauth_token").value = configure.oauth_token;
-    document.getElementById("api_key").value = configure.api_key;
+    document.getElementById("oauth_token").value = configure.swarm.oauth_token;
+    document.getElementById("api_key").value = configure.swarm.api_key;
+    document.getElementById("view_image").checked = configure.app.view_image;
 
     return configure;
 }
 
 async function reload_data() {
     const configure = load_configure();
-    const url = 'https://api.foursquare.com/v2/users/self/checkins?v=20231010&limit=30&offset=0&oauth_token=' + configure.oauth_token;
+    const url = 'https://api.foursquare.com/v2/users/self/checkins?v=20231010&limit=30&offset=0&oauth_token=' + configure.swarm.oauth_token;
     // console.log('url: ' + url);
     const headers = new Headers();
     headers.append('accept', 'application/json');
@@ -61,6 +65,9 @@ function get_image_url(disp_width, count, photo) {
 function load_data() {
     // title version
     document.getElementById('title').textContent = 'swarm c2c ver.0904';
+    // preview?
+    const configure = load_configure();
+    const preview_image = configure.app.view_image;
 
     const checkins = localStorage.getItem('rest_response');
     // console.log('checkins: ' + checkins);
@@ -73,7 +80,6 @@ function load_data() {
     else {
         const checkin_data = JSON.parse(checkins);
         // console.log('checkin_data: ' + checkin_data);
-        let view_image = document.getElementById("view_image");
 
         let display = document.getElementById("checkin_list");
         let index = 0;
@@ -121,7 +127,7 @@ function load_data() {
                     let photo_item = document.createElement("img");
                     let photo_url = get_image_url(display.clientWidth, photo_count, photos);
                     photo_item.src = photo_url;
-                    if (view_image.checked) {
+                    if (preview_image) {
                         photo_view.appendChild(photo_item);
                     }
                 }
@@ -207,7 +213,7 @@ async function get_detail(checkin_id) {
                 console.log('shortcut url is not exist');
 
                 const configure = load_configure();
-                const url = 'https://api.foursquare.com/v2/checkins/' + checkin_id + '?v=20231010&oauth_token=' + configure.oauth_token;
+                const url = 'https://api.foursquare.com/v2/checkins/' + checkin_id + '?v=20231010&oauth_token=' + configure.swarm.oauth_token;
                 const headers = new Headers();
                 headers.append('accept', 'application/json');
             
@@ -231,7 +237,7 @@ async function get_detail(checkin_id) {
                 const url = 'https://api.foursquare.com/v3/places/' + checkin.venue.id + '?fields=social_media';
                 const headers = new Headers();
                 headers.append('accept', 'application/json');
-                headers.append('Authorization', configure.api_key);
+                headers.append('Authorization', configure.swarm.api_key);
                 const res = await fetch(url, { headers: headers });
                 const response = await res.json();
                 console.log(response.social_media.twitter);
