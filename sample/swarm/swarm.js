@@ -251,7 +251,6 @@ async function get_detail(checkin_id) {
             else {
                 // console.log('private or obsolete');
                 result.social = {};
-                checkin.venueInfo = {twitter: response.social_media.twitter};
             }
             break;
         }
