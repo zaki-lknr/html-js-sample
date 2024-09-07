@@ -184,6 +184,7 @@ function clear_data() {
 }
 
 async function get_shortcut_url(checkin) {
+    const configure = load_configure();
     // console.log("get_shortcut_url() begin: " + checkin_id);
 
     const detail = await get_detail(checkin.id);
@@ -191,7 +192,7 @@ async function get_shortcut_url(checkin) {
     console.log(checkin);
 
     // const comment = document.getElementById(checkin.id + '_comment').textContent;
-    const comment = create_share_string(detail, detail.venueInfo.twitter);
+    const comment = create_share_string(detail, (configure.app.include_sns)? detail.venueInfo.twitter: null);
     const share_comment = comment + "\n" + detail.checkinShortUrl;
     console.log(comment);
     navigator.clipboard.writeText(share_comment);
