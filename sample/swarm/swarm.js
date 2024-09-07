@@ -187,15 +187,15 @@ async function get_shortcut_url(checkin) {
     // console.log("get_shortcut_url() begin: " + checkin_id);
 
     const detail = await get_detail(checkin.id);
-    document.getElementById(checkin.id).value = detail.url;
+    document.getElementById(checkin.id).value = detail.checkinShortUrl;
     console.log(checkin);
 
     // const comment = document.getElementById(checkin.id + '_comment').textContent;
-    const comment = create_share_string(checkin, detail.social?.twitter);
-    const share_comment = comment + "\n" + detail.url;
+    const comment = create_share_string(detail, detail.venueInfo.twitter);
+    const share_comment = comment + "\n" + detail.checkinShortUrl;
     console.log(comment);
     navigator.clipboard.writeText(share_comment);
-    window.open('https://x.com/intent/tweet?url=' + detail.url + '&text=' + encodeURIComponent(comment));
+    window.open('https://x.com/intent/tweet?url=' + detail.checkinShortUrl + '&text=' + encodeURIComponent(comment));
 }
 
 async function get_detail(checkin_id) {
@@ -203,14 +203,13 @@ async function get_detail(checkin_id) {
     // console.log('checkins: ' + checkins);
     const checkin_data = JSON.parse(checkins);
 
-    const result = {};
+    let result = {};
     for (let checkin of checkin_data.response.checkins.items) {
         // console.log('saved checkin id: ' + checkin.id);
         if (checkin_id === checkin.id) {
             // consolog.log('checkin id: ' + checkin_id);
             if ('checkinShortUrl' in checkin) {
                 console.log('shortcut url is exist');
-                result.url = checkin.checkinShortUrl;
             }
             else {
                 console.log('shortcut url is not exist');
@@ -225,13 +224,11 @@ async function get_detail(checkin_id) {
                 const response = await res.json();
                 // console.log(response.response.checkin.checkinShortUrl);
             
-                result.url = response.response.checkin.checkinShortUrl;
                 checkin.checkinShortUrl = response.response.checkin.checkinShortUrl;
             }
             if ('venueInfo' in checkin) {
                 // 追加情報あり(または取得済み未設定)
                 // console.log('already exist');
-                result.social = {twitter: checkin.venueInfo.twitter};
             }
             else if (!checkin.venue.private && !checkin.venue.closed) {
                 // 取得
@@ -245,13 +242,13 @@ async function get_detail(checkin_id) {
                 const response = await res.json();
                 console.log(response.social_media.twitter);
 
-                result.social = {twitter: response.social_media.twitter};
                 checkin.venueInfo = {twitter: response.social_media.twitter};
             }
             else {
                 // console.log('private or obsolete');
-                result.social = {};
+                checkin.venueInfo = {};
             }
+            result = checkin;
             break;
         }
     }
