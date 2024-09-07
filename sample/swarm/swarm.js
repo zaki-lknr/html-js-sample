@@ -5,10 +5,12 @@ function save_configure() {
     const input_apikey = document.getElementById("api_key").value;
     // console.log("oauth_token: " + input_token);
     const view_image = document.getElementById("view_image").checked;
+    const include_sns = document.getElementById("include_sns").checked;
 
     const configure = {
         app: {
             view_image: view_image,
+            include_sns: include_sns,
         },
         swarm: {
             oauth_token: input_token,
@@ -29,6 +31,7 @@ function load_configure() {
     document.getElementById("oauth_token").value = configure.swarm.oauth_token;
     document.getElementById("api_key").value = configure.swarm.api_key;
     document.getElementById("view_image").checked = configure.app.view_image;
+    document.getElementById("include_sns").checked = configure.app.include_sns;
 
     return configure;
 }
