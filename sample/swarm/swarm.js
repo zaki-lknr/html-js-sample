@@ -6,11 +6,13 @@ function save_configure() {
     // console.log("oauth_token: " + input_token);
     const view_image = document.getElementById("view_image").checked;
     const include_sns = document.getElementById("include_sns").checked;
+    const edit_tweet = document.getElementById("edit_tweet").checked;
 
     const configure = {
         app: {
             view_image: view_image,
             include_sns: include_sns,
+            edit_tweet: edit_tweet,
         },
         swarm: {
             oauth_token: input_token,
@@ -32,6 +34,7 @@ function load_configure() {
     document.getElementById("api_key").value = configure.swarm.api_key;
     document.getElementById("view_image").checked = configure.app.view_image;
     document.getElementById("include_sns").checked = configure.app.include_sns;
+    document.getElementById("edit_tweet").checked = configure.app.edit_tweet;
 
     return configure;
 }
@@ -196,7 +199,9 @@ async function get_shortcut_url(checkin) {
     const share_comment = comment + "\n" + detail.checkinShortUrl;
     console.log(comment);
     navigator.clipboard.writeText(share_comment);
-    window.open('https://x.com/intent/tweet?url=' + detail.checkinShortUrl + '&text=' + encodeURIComponent(comment));
+    if (configure.app.edit_tweet) {
+        window.open('https://x.com/intent/tweet?url=' + detail.checkinShortUrl + '&text=' + encodeURIComponent(comment));
+    }
 }
 
 async function get_detail(checkin_id) {
