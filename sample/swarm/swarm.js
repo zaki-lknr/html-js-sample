@@ -190,7 +190,7 @@ async function get_shortcut_url(checkin) {
     const configure = load_configure();
     // console.log("get_shortcut_url() begin: " + checkin_id);
 
-    const detail = await get_detail(checkin.id);
+    const detail = await get_detail(checkin.id, configure);
     document.getElementById(checkin.id).value = detail.checkinShortUrl;
     console.log(checkin);
 
@@ -204,7 +204,7 @@ async function get_shortcut_url(checkin) {
     }
 }
 
-async function get_detail(checkin_id) {
+async function get_detail(checkin_id, configure) {
     const checkins = localStorage.getItem('rest_response');
     // console.log('checkins: ' + checkins);
     const checkin_data = JSON.parse(checkins);
@@ -220,7 +220,6 @@ async function get_detail(checkin_id) {
             else {
                 console.log('shortcut url is not exist');
 
-                const configure = load_configure();
                 const url = 'https://api.foursquare.com/v2/checkins/' + checkin_id + '?v=20231010&oauth_token=' + configure.swarm.oauth_token;
                 const headers = new Headers();
                 headers.append('accept', 'application/json');
@@ -237,18 +236,22 @@ async function get_detail(checkin_id) {
                 // console.log('already exist');
             }
             else if (!checkin.venue.private && !checkin.venue.closed) {
-                // 取得
-                console.log("get place info");
-                const configure = load_configure();
-                const url = 'https://api.foursquare.com/v3/places/' + checkin.venue.id + '?fields=social_media';
-                const headers = new Headers();
-                headers.append('accept', 'application/json');
-                headers.append('Authorization', configure.swarm.api_key);
-                const res = await fetch(url, { headers: headers });
-                const response = await res.json();
-                console.log(response.social_media.twitter);
+                if (configure.swarm.api_key.length > 0) {
+                    // 取得
+                    console.log("get place info");
+                    const url = 'https://api.foursquare.com/v3/places/' + checkin.venue.id + '?fields=social_media';
+                    const headers = new Headers();
+                    headers.append('accept', 'application/json');
+                    headers.append('Authorization', configure.swarm.api_key);
+                    const res = await fetch(url, { headers: headers });
+                    const response = await res.json();
+                    console.log(response.social_media.twitter);
 
-                checkin.venueInfo = {twitter: response.social_media.twitter};
+                    checkin.venueInfo = {twitter: response.social_media.twitter};
+                }
+                else {
+                    checkin.venueInfo = {};
+                }
             }
             else {
                 // console.log('private or obsolete');
