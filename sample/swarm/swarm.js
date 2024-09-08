@@ -119,9 +119,9 @@ function load_data() {
             header_part.appendChild(checkin_datetime);
             let rest_button = document.createElement("button");
             rest_button.textContent = "get url";
-            // rest_button.onclick = 'get_shortcut_url()'; // 効かない
+            // rest_button.onclick = 'create_share()'; // 効かない
             rest_button.addEventListener('click', ()=> {
-                get_shortcut_url(checkin);
+                create_share(checkin);
             });
             header_part.appendChild(rest_button);
 
@@ -191,9 +191,9 @@ function clear_data() {
     }
 }
 
-async function get_shortcut_url(checkin) {
+async function create_share(checkin) {
     const configure = load_configure();
-    // console.log("get_shortcut_url() begin: " + checkin_id);
+    // console.log("create_share() begin: " + checkin_id);
 
     const detail = await get_detail(checkin.id, configure);
     document.getElementById(checkin.id).value = detail.checkinShortUrl;
