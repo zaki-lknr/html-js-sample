@@ -155,6 +155,11 @@ function create_share_string(checkin, twitter_id = null) {
     let location_str = '';
     let return_string;
     let twitter_string = '';
+    let event_string = '';
+
+    if ('event' in checkin) {
+        event_string = ' for ' + checkin.event.name;
+    }
     // formattedAddressが無いヴェニューもある
     if ('formattedAddress' in checkin.venue.location) {
         const location = ('address' in checkin.venue.location)? 1: 0;
@@ -165,10 +170,10 @@ function create_share_string(checkin, twitter_id = null) {
     }
 
     if ('shout' in checkin) {
-        return_string = checkin.shout + ' (@ ' + checkin.venue.name + twitter_string + location_str + ')';
+        return_string = checkin.shout + ' (@ ' + checkin.venue.name + twitter_string + event_string + location_str + ')';
     }
     else {
-        return_string = "I'm at " + checkin.venue.name + twitter_string + location_str;
+        return_string = "I'm at " + checkin.venue.name + twitter_string + event_string + location_str;
     }
 
     return return_string;
