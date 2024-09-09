@@ -138,6 +138,18 @@ function load_data() {
             header_part.appendChild(tw_checkbox);
             header_part.appendChild(tw_chk_label);
 
+            const acc_checkbox = document.createElement("input");
+            acc_checkbox.type = 'checkbox';
+            acc_checkbox.id = 'acc_edit_' + checkin.id;
+            acc_checkbox.name = 'acc_edit_' + checkin.id;
+            acc_checkbox.value = 'acc_edit_' + checkin.id;
+            acc_checkbox.checked = configure.app.include_sns;
+            const acc_chk_label = document.createElement("label");
+            acc_chk_label.htmlFor = 'acc_edit_' + checkin.id;
+            acc_chk_label.textContent = '@';
+            header_part.appendChild(acc_checkbox);
+            header_part.appendChild(acc_chk_label);
+
             let photo_count = checkin.photos.count;
             // console.log("photo count: " + photo_count);
             let photo_view = document.createElement("div");
