@@ -219,6 +219,8 @@ function clear_data() {
 async function create_share(checkin) {
     const configure = load_configure();
     // console.log("create_share() begin: " + checkin_id);
+    // get configure
+    const enable_tweet = document.getElementById('tw_edit_' + checkin.id).checked;
 
     const detail = await get_detail(checkin.id, configure);
     document.getElementById(checkin.id).value = detail.checkinShortUrl;
@@ -229,7 +231,7 @@ async function create_share(checkin) {
     const share_comment = comment + "\n" + detail.checkinShortUrl;
     console.log(comment);
     navigator.clipboard.writeText(share_comment);
-    if (configure.app.edit_tweet) {
+    if (enable_tweet) {
         window.open('https://x.com/intent/tweet?url=' + detail.checkinShortUrl + '&text=' + encodeURIComponent(comment));
     }
 }
