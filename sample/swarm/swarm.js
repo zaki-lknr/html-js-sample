@@ -125,6 +125,19 @@ function load_data() {
             });
             header_part.appendChild(rest_button);
 
+            // item config
+            const tw_checkbox = document.createElement("input");
+            tw_checkbox.type = 'checkbox';
+            tw_checkbox.id = 'tw_edit_' + checkin.id;
+            tw_checkbox.name = 'tw_edit_' + checkin.id;
+            tw_checkbox.value = 'tw_edit_' + checkin.id;
+            tw_checkbox.checked = configure.app.edit_tweet;
+            const tw_chk_label = document.createElement("label");
+            tw_chk_label.htmlFor = 'tw_edit_' + checkin.id;
+            tw_chk_label.textContent = 'tw';
+            header_part.appendChild(tw_checkbox);
+            header_part.appendChild(tw_chk_label);
+
             let photo_count = checkin.photos.count;
             // console.log("photo count: " + photo_count);
             let photo_view = document.createElement("div");
