@@ -140,12 +140,12 @@ function load_data() {
 
             const acc_checkbox = document.createElement("input");
             acc_checkbox.type = 'checkbox';
-            acc_checkbox.id = 'acc_edit_' + checkin.id;
-            acc_checkbox.name = 'acc_edit_' + checkin.id;
-            acc_checkbox.value = 'acc_edit_' + checkin.id;
+            acc_checkbox.id = 'acc_include_' + checkin.id;
+            acc_checkbox.name = 'acc_include_' + checkin.id;
+            acc_checkbox.value = 'acc_include_' + checkin.id;
             acc_checkbox.checked = configure.app.include_sns;
             const acc_chk_label = document.createElement("label");
-            acc_chk_label.htmlFor = 'acc_edit_' + checkin.id;
+            acc_chk_label.htmlFor = 'acc_include_' + checkin.id;
             acc_chk_label.textContent = '@';
             header_part.appendChild(acc_checkbox);
             header_part.appendChild(acc_chk_label);
@@ -221,13 +221,14 @@ async function create_share(checkin) {
     // console.log("create_share() begin: " + checkin_id);
     // get configure
     const enable_tweet = document.getElementById('tw_edit_' + checkin.id).checked;
+    const include_account = document.getElementById('acc_include_' + checkin.id).checked;
 
     const detail = await get_detail(checkin.id, configure);
     document.getElementById(checkin.id).value = detail.checkinShortUrl;
     console.log(checkin);
 
     // const comment = document.getElementById(checkin.id + '_comment').textContent;
-    const comment = create_share_string(detail, (configure.app.include_sns)? detail.venueInfo.twitter: null);
+    const comment = create_share_string(detail, (include_account)? detail.venueInfo.twitter: null);
     const share_comment = comment + "\n" + detail.checkinShortUrl;
     console.log(comment);
     navigator.clipboard.writeText(share_comment);
