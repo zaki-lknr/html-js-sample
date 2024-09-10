@@ -158,10 +158,9 @@ async function post_message(message, local_image, image_url, session, bsky_id) {
         }
     }
     // console.log(body);
-    // if (message.search('@3rdhakatadaruma')) {
-    //     const f = get_url_facet(message, '@3rdhakatadaruma', 'https://x.com/3rdhakatadaruma');
-    //     body.record.facets.push(f);
-    // }
+    const f = get_tw_accounts_facets(message);
+    console.log(f);
+    body.record.facets.push(...f);
 
     const tags = search_tag_pos(update_msg);
     if (tags != null) {
@@ -222,6 +221,19 @@ async function post_image(session, image_file, image_url) {
     const res_json = await res.json()
     // console.log(res_json);
     return res_json.blob;
+}
+
+function get_tw_accounts_facets(message) {
+    const result = [];
+    const regex = RegExp(/\@[_a-zA-Z0-9]+/, 'g');
+    let e;
+    while (e = regex.exec(message)) {
+        const account = message.substring(e.index, e.index + e[0].length);
+        const url = 'https://x.com/' + account.replace(/@/, '');
+        const f = get_url_facet(message, account, url);
+        result.push(f);
+    }
+    return result;
 }
 
 function get_url_facet(message, substring, url) {
