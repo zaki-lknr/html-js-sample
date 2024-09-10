@@ -159,7 +159,7 @@ async function post_message(message, local_image, image_url, session, bsky_id) {
     }
     // console.log(body);
     const f = get_tw_accounts_facets(message);
-    console.log(f);
+    // console.log(f);
     body.record.facets.push(...f);
 
     const tags = search_tag_pos(update_msg);
