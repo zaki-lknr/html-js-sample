@@ -225,7 +225,7 @@ async function post_image(session, image_file, image_url) {
 
 function get_tw_accounts_facets(message) {
     const result = [];
-    const regex = RegExp(/\@[_a-zA-Z0-9]+/, 'g');
+    const regex = RegExp(/\@[_a-zA-Z0-9]+(?=($|\s|,|\. ))/, 'g');
     let e;
     while (e = regex.exec(message)) {
         const account = message.substring(e.index, e.index + e[0].length);
