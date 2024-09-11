@@ -277,10 +277,24 @@ async function get_detail(checkin_id, configure) {
                     headers.append('accept', 'application/json');
                     headers.append('Authorization', configure.swarm.api_key);
                     const res = await fetch(url, { headers: headers });
-                    const response = await res.json();
-                    console.log(response.social_media.twitter);
+                    if (res.status === 404) {
+                        // venueの詳細情報が無い(原因不明)
+                        console.log(await res.text());
+                        checkin.venueInfo = {};
+                        // 台場交差点(id:4bee05ae4daaa593c7a88f61)
+                        // 台場2丁目バス停(id:4d397ec6beb7b1f72fbedf71)
+                        // …など
+                    }
+                    else if (res.status === 200) {
+                        const response = await res.json();
+                        console.log(response.social_media.twitter);
 
-                    checkin.venueInfo = {twitter: response.social_media.twitter};
+                        checkin.venueInfo = {twitter: response.social_media.twitter};
+                    }
+                    else {
+                        // error
+                        console.log(res);
+                    }
                 }
                 else {
                     checkin.venueInfo = {};
