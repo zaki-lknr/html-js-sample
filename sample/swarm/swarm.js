@@ -70,7 +70,7 @@ function get_image_url(disp_width, count, photo) {
 
 function load_data() {
     // title version
-    document.getElementById('title').textContent = 'swarm c2c ver.0909';
+    document.getElementById('title').textContent = 'swarm c2c ver.0912';
     // preview?
     const configure = load_configure();
     const preview_image = configure.app.view_image;
