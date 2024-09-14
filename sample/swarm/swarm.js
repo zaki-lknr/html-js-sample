@@ -30,11 +30,11 @@ function load_configure() {
     const configure = JSON.parse(localStorage.getItem('configure'));
     // update page
     // console.log('token: '+ configure.oauth_token);
-    document.getElementById("oauth_token").value = configure.swarm.oauth_token;
-    document.getElementById("api_key").value = configure.swarm.api_key;
-    document.getElementById("view_image").checked = configure.app.view_image;
-    document.getElementById("include_sns").checked = configure.app.include_sns;
-    document.getElementById("edit_tweet").checked = configure.app.edit_tweet;
+    document.getElementById("oauth_token").value = configure?.swarm?.oauth_token;
+    document.getElementById("api_key").value = configure?.swarm?.api_key;
+    document.getElementById("view_image").checked = configure?.app?.view_image;
+    document.getElementById("include_sns").checked = configure?.app?.include_sns;
+    document.getElementById("edit_tweet").checked = configure?.app?.edit_tweet;
 
     return configure;
 }
@@ -73,7 +73,7 @@ function load_data() {
     document.getElementById('title').textContent = 'swarm c2c ver.0912';
     // preview?
     const configure = load_configure();
-    const preview_image = configure.app.view_image;
+    const preview_image = configure?.app?.view_image;
 
     const checkins = localStorage.getItem('rest_response');
     // console.log('checkins: ' + checkins);
