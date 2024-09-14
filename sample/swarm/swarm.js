@@ -1,6 +1,8 @@
 function save_configure() {
     // console.log("save_configure() begin");
     // get form data
+    const client_id = document.getElementById("client_id").value;
+    const client_secret = document.getElementById("client_secret").value;
     const input_token = document.getElementById("oauth_token").value;
     const input_apikey = document.getElementById("api_key").value;
     // console.log("oauth_token: " + input_token);
@@ -17,6 +19,8 @@ function save_configure() {
         swarm: {
             oauth_token: input_token,
             api_key: input_apikey,
+            client_id: client_id,
+            client_secret: client_secret,
         }
     }
     console.log(configure);
@@ -30,6 +34,8 @@ function load_configure() {
     const configure = JSON.parse(localStorage.getItem('configure'));
     // update page
     // console.log('token: '+ configure.oauth_token);
+    document.getElementById("client_id").value = configure?.swarm?.client_id;
+    document.getElementById("client_secret").value = configure?.swarm?.client_secret;
     document.getElementById("oauth_token").value = configure?.swarm?.oauth_token;
     document.getElementById("api_key").value = configure?.swarm?.api_key;
     document.getElementById("view_image").checked = configure?.app?.view_image;
@@ -59,7 +65,9 @@ async function reload_data() {
 
 function swarm_oauth() {
     console.log('swarm_oauth() begin');
-    const client_id = '';
+    save_configure();
+    const configure = load_configure();
+    const client_id = configure?.swarm?.client_id;
     const redirect_url = 'https://www.jp-z.jp/swarm/';
     const url = 'https://foursquare.com/oauth2/authenticate?client_id=' + client_id + '&response_type=code&redirect_uri=' + redirect_url;
 
@@ -67,8 +75,9 @@ function swarm_oauth() {
 }
 async function swarm_oauth2(code) {
     console.log('swarm_oauth2() begin');
-    const client_id = '';
-    const client_secret = '';
+    const configure = load_configure();
+    const client_id = configure?.swarm?.client_id;
+    const client_secret = configure?.swarm?.client_secret;
     const redirect_url = 'https://www.jp-z.jp/swarm/';
     const url = 'https://foursquare.com/oauth2/access_token?client_id=' + client_id + '&client_secret=' + client_secret +'&grant_type=authorization_code&redirect_uri=' + redirect_url + '&code=' + code;
     const res = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
