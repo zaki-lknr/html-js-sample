@@ -89,6 +89,9 @@ function load_data() {
 
         let display = document.getElementById("checkin_list");
         let index = 0;
+        const today = new Date();   // 当日チェックインカウント判定用
+        let today_count = 0;
+        // console.log(today.toLocaleDateString());
         for (let checkin of checkin_data.response.checkins.items) {
             // console.log("checkin: " + checkin.venue.name);
             // console.log("createdAt: " + checkin.venue.createdAt);
@@ -115,6 +118,9 @@ function load_data() {
             let checkin_datetime = document.createElement("div");
             let datetime = new Date(checkin.createdAt * 1000);
             checkin_datetime.textContent = '['+ (++index) + '] ' + datetime.toLocaleDateString() + ' ' + datetime.toLocaleTimeString();
+            if (datetime.toLocaleDateString() === today.toLocaleDateString()) {
+                today_count++;
+            }
 
             header_part.appendChild(checkin_datetime);
             let rest_button = document.createElement("button");
@@ -173,6 +179,8 @@ function load_data() {
             component.appendChild(item_hr);
             display.appendChild(component);
         }
+        const comment_view = document.getElementById("comment");
+        comment_view.textContent = 'todays checkin: ' + today_count;
     }
 }
 
