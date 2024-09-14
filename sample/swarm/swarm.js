@@ -57,6 +57,31 @@ async function reload_data() {
     load_data();
 }
 
+function swarm_oauth() {
+    console.log('swarm_oauth() begin');
+    const client_id = '';
+    const redirect_url = 'https://www.jp-z.jp/swarm/';
+    const url = 'https://foursquare.com/oauth2/authenticate?client_id=' + client_id + '&response_type=code&redirect_uri=' + redirect_url;
+
+    window.location.href = url;
+}
+async function swarm_oauth2(code) {
+    console.log('swarm_oauth2() begin');
+    const client_id = '';
+    const client_secret = '';
+    const redirect_url = 'https://www.jp-z.jp/swarm/';
+    const url = 'https://foursquare.com/oauth2/access_token?client_id=' + client_id + '&client_secret=' + client_secret +'&grant_type=authorization_code&redirect_uri=' + redirect_url + '&code=' + code;
+    const res = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
+
+    const response = await res.json();
+    if (response.access_token.length > 0) {
+        load_configure();
+        document.getElementById("oauth_token").value = response.access_token;
+        save_configure();
+        window.location.href = redirect_url;
+    }
+}
+
 function get_image_url(disp_width, count, photo) {
     let w = disp_width * 0.95;
     let h = photo.height * w / photo.height;
@@ -70,7 +95,18 @@ function get_image_url(disp_width, count, photo) {
 
 function load_data() {
     // title version
-    document.getElementById('title').textContent = 'swarm c2c ver.0912';
+    document.getElementById('title').textContent = 'swarm c2c ver.0914';
+
+    // oauth?
+    if (window.location.search.length > 0) {
+        const param = new URLSearchParams(window.location.search);
+        // console.log(param);
+        const code = param.get('code');
+        console.log(code);
+        const token = swarm_oauth2(code);
+        return;
+    }
+
     // preview?
     const configure = load_configure();
     const preview_image = configure?.app?.view_image;
