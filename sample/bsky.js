@@ -32,7 +32,7 @@ async function post() {
     const configure = load_configure();
     const message = document.getElementById("post_string").value;
     const image_url = document.getElementById("image_url").value;
-    const local_image = document.getElementById("file").files[0];
+    const local_images = document.getElementById("file").files;
 
     // let message = document.getElementById("post_string").value;
     // // let message = 'YouTube https://www.youtube.com/ です。';
@@ -50,8 +50,8 @@ async function post() {
     const {JpzBskyClient} = await import("./bsky-client.js");
 
     const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
-    if (local_image) {
-        bsky.setImageFile(local_image);
+    if (local_images) {
+        bsky.setImageFiles(local_images);
     }
     if (image_url) {
         bsky.setImageUrl(image_url);

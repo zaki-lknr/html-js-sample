@@ -4,8 +4,7 @@ export class JpzBskyClient {
 
     message;
     // attach;
-    image_file;
-    // image_url;
+    image_files;
     image_urls = [];
 
     constructor(id, pass) {
@@ -15,10 +14,10 @@ export class JpzBskyClient {
 
     setImageUrl(image_url) {
         this.image_urls.push(image_url);
-        this.image_file = null;
+        this.image_files = null;
     }
-    setImageFile(image_file) {
-        this.image_file = image_file;
+    setImageFiles(image_files) {
+        this.image_files = image_files;
         this.image_urls.splice(0);
     }
 
@@ -61,13 +60,11 @@ export class JpzBskyClient {
         // 添付画像URL
         let image_blob = null;
         let ogp = null;
-        if (this.image_file != null) {
+        if (this.image_files != null) {
             image_blob = await this.#post_image(session);
         }
         else if (this.image_urls.length) {
             image_blob = await this.#post_image(session);
-            // console.log(image_blob);
-            // console.log(image_blob.mimeType);
         }
         else if (url_objs != null) {
             // 添付画像はないけどURLがある場合
@@ -100,12 +97,6 @@ export class JpzBskyClient {
             body.record.embed = {
                 $type: "app.bsky.embed.images",
                 images: [],
-                // images: [
-                //     {
-                //         image: image_blob,
-                //         alt: "sample image upload",
-                //     },
-                // ]
             }
             for (const blob of image_blob) {
                 body.record.embed.images.push(
@@ -183,15 +174,13 @@ export class JpzBskyClient {
     }
 
     async #post_image(session) {
-        // let image_blob = [];
-        // let image_type = [];
         const inputs = [];
         const resp_blob = [];
     
-        if (this.image_file != null) {
-            // image_blob.push(this.image_file);
-            // image_type.push(this.image_file.type);
-            inputs.push({blob: this.image_file, type: this.image_file.type});
+        if (this.image_files != null) {
+            for (const image_file of this.image_files) {
+                inputs.push({blob: image_file, type: image_file.type});
+            }
         }
         else {
             for (const image_url of this.image_urls) {
@@ -203,8 +192,6 @@ export class JpzBskyClient {
                     }
                     const image = await res_img.blob();
                     const buffer = await image.arrayBuffer();
-                    // image_blob.push(new Uint8Array(buffer));
-                    // image_type.push(image.type);
                     inputs.push({blob: new Uint8Array(buffer), type: image.type});
                 }
             }
