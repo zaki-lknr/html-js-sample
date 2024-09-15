@@ -329,9 +329,9 @@ async function create_share(checkin) {
         const {JpzBskyClient} = await import("./bsky-client.js");
 
         const bsky = new JpzBskyClient(configure.bsky.bsky_id, configure.bsky.bsky_pass);
-        if (checkin.photos.count) {
+        for (const photo of checkin.photos.items) {
             // bsky.setImageUrl(checkin.photos.items[]);
-            const photo_url = get_image_url(checkin.photos.items[0].width, 1, checkin.photos.items[0]); // 暫定
+            const photo_url = get_image_url(photo.width, 1, photo); // 暫定
             console.log(photo_url);
             bsky.setImageUrl(photo_url);
         }
