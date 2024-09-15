@@ -115,14 +115,20 @@ async function swarm_oauth2(code) {
 }
 
 function get_image_url(disp_width, count, photo) {
-    let w = disp_width * 0.95;
-    let h = photo.height * w / photo.width;
-    if (count != 1) {
-        // さらに半分
-        w = w / 2;
-        h = h / 2;
+    if (count === 0) {
+        // count=0はオリジナルの値を返す
+        return photo.prefix + photo.width + 'x' + photo.height + photo.suffix;
     }
-    return photo.prefix + Math.round(w) + 'x' + Math.round(h) + photo.suffix;
+    else {
+        let w = disp_width * 0.95;
+        let h = photo.height * w / photo.width;
+        if (count != 1) {
+            // さらに半分
+            w = w / 2;
+            h = h / 2;
+        }
+        return photo.prefix + Math.round(w) + 'x' + Math.round(h) + photo.suffix;
+    }
 }
 
 function load_data() {
@@ -331,7 +337,7 @@ async function create_share(checkin) {
         const bsky = new JpzBskyClient(configure.bsky.bsky_id, configure.bsky.bsky_pass);
         for (const photo of checkin.photos.items) {
             // bsky.setImageUrl(checkin.photos.items[]);
-            const photo_url = get_image_url(photo.width, 1, photo); // 暫定
+            const photo_url = get_image_url(photo.width, 0, photo);
             console.log(photo_url);
             bsky.setImageUrl(photo_url);
         }
