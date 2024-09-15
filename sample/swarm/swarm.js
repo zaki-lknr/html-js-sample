@@ -34,13 +34,20 @@ function load_configure() {
     const configure = JSON.parse(localStorage.getItem('configure'));
     // update page
     // console.log('token: '+ configure.oauth_token);
-    document.getElementById("client_id").value = configure?.swarm?.client_id;
-    document.getElementById("client_secret").value = configure?.swarm?.client_secret;
-    document.getElementById("oauth_token").value = configure?.swarm?.oauth_token;
-    document.getElementById("api_key").value = configure?.swarm?.api_key;
-    document.getElementById("view_image").checked = configure?.app?.view_image;
-    document.getElementById("include_sns").checked = configure?.app?.include_sns;
-    document.getElementById("edit_tweet").checked = configure?.app?.edit_tweet;
+    if (configure?.swarm?.client_id)
+        document.getElementById("client_id").value = configure?.swarm?.client_id;
+    if (configure?.swarm?.client_secret)
+        document.getElementById("client_secret").value = configure?.swarm?.client_secret;
+    if (configure?.swarm?.oauth_token)
+        document.getElementById("oauth_token").value = configure?.swarm?.oauth_token;
+    if (configure?.swarm?.api_key)
+        document.getElementById("api_key").value = configure?.swarm?.api_key;
+    if (configure?.app?.view_image)
+        document.getElementById("view_image").checked = configure?.app?.view_image;
+    if (configure?.app?.include_sns)
+        document.getElementById("include_sns").checked = configure?.app?.include_sns;
+    if (configure?.app?.edit_tweet)
+        document.getElementById("edit_tweet").checked = configure?.app?.edit_tweet;
 
     return configure;
 }
