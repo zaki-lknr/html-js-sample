@@ -10,6 +10,7 @@ function save_configure() {
     const bsky_pass = document.getElementById("bsky_pass").value;
 
     // console.log("oauth_token: " + input_token);
+    const post_bsky = document.getElementById("post_bsky").checked;
     const view_image = document.getElementById("view_image").checked;
     const include_sns = document.getElementById("include_sns").checked;
     const edit_tweet = document.getElementById("edit_tweet").checked;
@@ -19,6 +20,7 @@ function save_configure() {
             view_image: view_image,
             include_sns: include_sns,
             edit_tweet: edit_tweet,
+            post_bsky: post_bsky,
         },
         swarm: {
             oauth_token: input_token,
@@ -56,6 +58,8 @@ function load_configure() {
         document.getElementById("bsky_pass").value = configure?.bsky?.bsky_pass;
     if (configure?.app?.view_image)
         document.getElementById("view_image").checked = configure?.app?.view_image;
+    if (configure?.app?.post_bsky)
+        document.getElementById("post_bsky").checked = configure?.app?.post_bsky;
     if (configure?.app?.include_sns)
         document.getElementById("include_sns").checked = configure?.app?.include_sns;
     if (configure?.app?.edit_tweet)
@@ -196,6 +200,18 @@ function load_data() {
             header_part.appendChild(rest_button);
 
             // item config
+            const bsky_checkbox = document.createElement("input");
+            bsky_checkbox.type = 'checkbox';
+            bsky_checkbox.id = 'bsky_' + checkin.id;
+            bsky_checkbox.name = 'bsky_' + checkin.id;
+            bsky_checkbox.value = 'bsky_' + checkin.id;
+            bsky_checkbox.checked = configure.app.post_bsky;
+            const bsky_chk_label = document.createElement("label");
+            bsky_chk_label.htmlFor = 'bsky_' + checkin.id;
+            bsky_chk_label.textContent = '🦋';
+            header_part.appendChild(bsky_checkbox);
+            header_part.appendChild(bsky_chk_label);
+
             const tw_checkbox = document.createElement("input");
             tw_checkbox.type = 'checkbox';
             tw_checkbox.id = 'tw_edit_' + checkin.id;
@@ -204,7 +220,7 @@ function load_data() {
             tw_checkbox.checked = configure.app.edit_tweet;
             const tw_chk_label = document.createElement("label");
             tw_chk_label.htmlFor = 'tw_edit_' + checkin.id;
-            tw_chk_label.textContent = 'tw';
+            tw_chk_label.textContent = '𝕏';
             header_part.appendChild(tw_checkbox);
             header_part.appendChild(tw_chk_label);
 
