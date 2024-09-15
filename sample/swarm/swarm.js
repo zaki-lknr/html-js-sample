@@ -100,7 +100,7 @@ async function swarm_oauth2(code) {
 
 function get_image_url(disp_width, count, photo) {
     let w = disp_width * 0.95;
-    let h = photo.height * w / photo.height;
+    let h = photo.height * w / photo.width;
     if (count != 1) {
         // さらに半分
         w = w / 2;
