@@ -5,6 +5,10 @@ function save_configure() {
     const client_secret = document.getElementById("client_secret").value;
     const input_token = document.getElementById("oauth_token").value;
     const input_apikey = document.getElementById("api_key").value;
+    // bsky
+    const bsky_id = document.getElementById("bsky_id").value;
+    const bsky_pass = document.getElementById("bsky_pass").value;
+
     // console.log("oauth_token: " + input_token);
     const view_image = document.getElementById("view_image").checked;
     const include_sns = document.getElementById("include_sns").checked;
@@ -21,7 +25,11 @@ function save_configure() {
             api_key: input_apikey,
             client_id: client_id,
             client_secret: client_secret,
-        }
+        },
+        bsky: {
+            bsky_id: bsky_id,
+            bsky_pass: bsky_pass,
+        },
     }
     console.log(configure);
     // save to local storage
@@ -42,6 +50,10 @@ function load_configure() {
         document.getElementById("oauth_token").value = configure?.swarm?.oauth_token;
     if (configure?.swarm?.api_key)
         document.getElementById("api_key").value = configure?.swarm?.api_key;
+    if (configure?.bsky?.bsky_id)
+        document.getElementById("bsky_id").value = configure?.bsky?.bsky_id;
+    if (configure?.bsky?.bsky_pass)
+        document.getElementById("bsky_pass").value = configure?.bsky?.bsky_pass;
     if (configure?.app?.view_image)
         document.getElementById("view_image").checked = configure?.app?.view_image;
     if (configure?.app?.include_sns)
@@ -111,7 +123,7 @@ function get_image_url(disp_width, count, photo) {
 
 function load_data() {
     // title version
-    document.getElementById('title').textContent = 'swarm c2c ver.0914';
+    document.getElementById('title').textContent = 'swarm c2c ver.0915';
 
     // oauth?
     if (window.location.search.length > 0) {
