@@ -5,7 +5,8 @@ export class JpzBskyClient {
     message;
     // attach;
     image_file;
-    image_url;
+    // image_url;
+    image_urls = [];
 
     constructor(id, pass) {
         this.bsky_id = id;
@@ -13,12 +14,12 @@ export class JpzBskyClient {
     }
 
     setImageUrl(image_url) {
-        this.image_url = image_url;
+        this.image_urls.push(image_url);
         this.image_file = null;
     }
     setImageFile(image_file) {
         this.image_file = image_file;
-        this.image_url = null;
+        this.image_urls.splice(0);
     }
 
     // async post(message, attach = null) {
@@ -63,7 +64,7 @@ export class JpzBskyClient {
         if (this.image_file != null) {
             image_blob = await this.#post_image(session);
         }
-        else if (this.image_url?.startsWith('http')) {
+        else if (this.image_urls.length) {
             image_blob = await this.#post_image(session);
             // console.log(image_blob);
             // console.log(image_blob.mimeType);
@@ -72,7 +73,7 @@ export class JpzBskyClient {
             // 添付画像はないけどURLがある場合
             ogp = await this.#get_ogp(url_objs[0].url);
             if (ogp['og:image']) {
-                this.image_url = ogp['og:image'];
+                this.image_urls.push(ogp['og:image']);
                 image_blob = await this.#post_image(session);
             }
         }
@@ -98,12 +99,21 @@ export class JpzBskyClient {
             // 画像指定あり
             body.record.embed = {
                 $type: "app.bsky.embed.images",
-                images: [
+                images: [],
+                // images: [
+                //     {
+                //         image: image_blob,
+                //         alt: "sample image upload",
+                //     },
+                // ]
+            }
+            for (const blob of image_blob) {
+                body.record.embed.images.push(
                     {
-                        image: image_blob,
-                        alt: "sample image upload",
-                    },
-                ]
+                        image: blob,
+                        alt: '',
+                    }
+                )
             }
         }
     
@@ -173,37 +183,49 @@ export class JpzBskyClient {
     }
 
     async #post_image(session) {
-        let image_blob;
-        let image_type;
+        // let image_blob = [];
+        // let image_type = [];
+        const inputs = [];
+        const resp_blob = [];
     
         if (this.image_file != null) {
-            image_blob = this.image_file;
-            image_type = this.image_file.type;
+            // image_blob.push(this.image_file);
+            // image_type.push(this.image_file.type);
+            inputs.push({blob: this.image_file, type: this.image_file.type});
         }
         else {
-            // get image
-            const res_img = await fetch('https://corsproxy.io/?' + encodeURIComponent(this.image_url));
-            if (!res_img.ok) {
-                throw new Error('https://corsproxy.io/?' + encodeURIComponent(this.image_url) + ': ' + await res_img.text());
+            for (const image_url of this.image_urls) {
+                if (image_url.startsWith('http')) {
+                    // get image
+                    const res_img = await fetch('https://corsproxy.io/?' + encodeURIComponent(image_url));
+                    if (!res_img.ok) {
+                        throw new Error('https://corsproxy.io/?' + encodeURIComponent(image_url) + ': ' + await res_img.text());
+                    }
+                    const image = await res_img.blob();
+                    const buffer = await image.arrayBuffer();
+                    // image_blob.push(new Uint8Array(buffer));
+                    // image_type.push(image.type);
+                    inputs.push({blob: new Uint8Array(buffer), type: image.type});
+                }
             }
-            const image = await res_img.blob();
-            const buffer = await image.arrayBuffer();
-            image_blob = new Uint8Array(buffer);
-            image_type = image.type;
         }
     
         const url = "https://bsky.social/xrpc/com.atproto.repo.uploadBlob";
-        const headers = new Headers();
-        headers.append('Authorization', "Bearer " + session.accessJwt);
-        headers.append('Content-Type', image_type);
-        
-        const res = await fetch(url, { method: "POST", body: image_blob, headers: headers });
-        if (!res.ok) {
-            throw new Error('https://bsky.social/xrpc/com.atproto.repo.uploadBlob: ' + await res.text());
+        for (const item of inputs) {
+            const headers = new Headers();
+            headers.append('Authorization', "Bearer " + session.accessJwt);
+            headers.append('Content-Type', item.type);
+            
+            const res = await fetch(url, { method: "POST", body: item.blob, headers: headers });
+            if (!res.ok) {
+                throw new Error('https://bsky.social/xrpc/com.atproto.repo.uploadBlob: ' + await res.text());
+            }
+            const res_json = await res.json()
+            // console.log(res_json);
+            resp_blob.push(res_json.blob);
+            // return res_json.blob;
         }
-        const res_json = await res.json()
-        // console.log(res_json);
-        return res_json.blob;
+        return resp_blob;
     }
 
     async #get_ogp(url) {
