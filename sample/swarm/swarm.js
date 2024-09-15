@@ -310,6 +310,7 @@ async function create_share(checkin) {
     // get configure
     const enable_tweet = document.getElementById('tw_edit_' + checkin.id).checked;
     const include_account = document.getElementById('acc_include_' + checkin.id).checked;
+    const post_bsky = document.getElementById('bsky_' + checkin.id).checked;
 
     const detail = await get_detail(checkin.id, configure);
     document.getElementById(checkin.id).value = detail.checkinShortUrl;
@@ -322,6 +323,19 @@ async function create_share(checkin) {
     navigator.clipboard.writeText(share_comment);
     if (enable_tweet) {
         window.open('https://x.com/intent/tweet?url=' + detail.checkinShortUrl + '&text=' + encodeURIComponent(comment));
+    }
+
+    if (post_bsky) {
+        const {JpzBskyClient} = await import("./bsky-client.js");
+
+        const bsky = new JpzBskyClient(configure.bsky.bsky_id, configure.bsky.bsky_pass);
+        if (checkin.photos.count) {
+            // bsky.setImageUrl(checkin.photos.items[]);
+            const photo_url = get_image_url(checkin.photos.items[0].width, 1, checkin.photos.items[0]); // 暫定
+            console.log(photo_url);
+            bsky.setImageUrl(photo_url);
+        }
+        bsky.post(share_comment);
     }
 }
 
