@@ -133,7 +133,7 @@ function get_image_url(disp_width, count, photo) {
 
 function load_data() {
     // title version
-    document.getElementById('title').textContent = 'swarm c2c ver.0915';
+    document.getElementById('title').textContent = 'swarm c2c ver.0916a';
 
     // oauth?
     if (window.location.search.length > 0) {
@@ -198,7 +198,7 @@ function load_data() {
 
             header_part.appendChild(checkin_datetime);
             let rest_button = document.createElement("button");
-            rest_button.textContent = "get url";
+            rest_button.textContent = "share";
             // rest_button.onclick = 'create_share()'; // 効かない
             rest_button.addEventListener('click', ()=> {
                 create_share(checkin);
@@ -335,13 +335,21 @@ async function create_share(checkin) {
         const {JpzBskyClient} = await import("./bsky-client.js");
 
         const bsky = new JpzBskyClient(configure.bsky.bsky_id, configure.bsky.bsky_pass);
+        bsky.setCorsProxyByGetImage(false);
         for (const photo of checkin.photos.items) {
             // bsky.setImageUrl(checkin.photos.items[]);
             const photo_url = get_image_url(photo.width, 0, photo);
             console.log(photo_url);
             bsky.setImageUrl(photo_url);
         }
-        bsky.post(share_comment);
+        try {
+            await bsky.post(share_comment);
+            // console.log(ret);
+            // alert()
+        }
+        catch (e) {
+            alert('ERR: ' + e);
+        }
     }
 }
 

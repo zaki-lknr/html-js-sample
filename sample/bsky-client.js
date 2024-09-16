@@ -7,9 +7,12 @@ export class JpzBskyClient {
     image_files;
     image_urls = [];
 
+    use_corsproxy_getimage = false;
+
     constructor(id, pass) {
         this.bsky_id = id;
         this.bsky_pass = pass;
+        this.useCorsProxyByGetImage = false;
     }
 
     setImageUrl(image_url) {
@@ -19,6 +22,10 @@ export class JpzBskyClient {
     setImageFiles(image_files) {
         this.image_files = image_files;
         this.image_urls.splice(0);
+    }
+
+    setCorsProxyByGetImage(useCorsProxy = false) {
+        this.use_corsproxy_getimage = useCorsProxy;
     }
 
     // async post(message, attach = null) {
@@ -186,17 +193,18 @@ export class JpzBskyClient {
             for (const image_url of this.image_urls) {
                 if (image_url.startsWith('http')) {
                     // get image
+                    const url = (this.use_corsproxy_getimage)? 'https://corsproxy.io/?' + encodeURIComponent(image_url): image_url;
                     try {
-                        const res_img = await fetch('https://corsproxy.io/?' + encodeURIComponent(image_url));
+                        const res_img = await fetch(url);
                         if (!res_img.ok) {
-                            throw new Error('https://corsproxy.io/?' + encodeURIComponent(image_url) + ': ' + await res_img.text());
+                            throw new Error(url + ': ' + await res_img.text());
                         }
                         const image = await res_img.blob();
                         const buffer = await image.arrayBuffer();
                         inputs.push({blob: new Uint8Array(buffer), type: image.type});
                     }
                     catch(err) {
-                        throw new Error('get image_url failed: ' + err + "\nurl: " + 'https://corsproxy.io/?' + encodeURIComponent(image_url));
+                        throw new Error('get image_url failed: ' + err + "\nurl: " + url);
                     }
                 }
             }
