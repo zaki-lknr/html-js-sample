@@ -7,6 +7,8 @@ export class JpzBskyClient {
     image_files;
     image_urls = [];
 
+    via = 'JpzBskyClient';
+
     use_corsproxy_getimage = false;
     use_corsproxy_getogp = false;
 
@@ -31,6 +33,10 @@ export class JpzBskyClient {
     }
     enableCorsProxyAtOgp(useCorsProxy = false) {
         this.use_corsproxy_getogp = useCorsProxy;
+    }
+
+    setClientVia(via) {
+        this.via = via;
     }
 
     // async post(message, attach = null) {
@@ -100,7 +106,7 @@ export class JpzBskyClient {
                 createdAt: new Date().toISOString(),
                 $type: "app.bsky.feed.post",
                 facets: [],
-                via: 'JpzBskyClient'
+                via: this.via,
             }
         };
     

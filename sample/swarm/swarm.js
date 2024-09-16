@@ -133,7 +133,7 @@ function get_image_url(disp_width, count, photo) {
 
 function load_data() {
     // title version
-    document.getElementById('title').textContent = 'swarm c2c ver.0916a';
+    document.getElementById('title').textContent = 'swarm c2c ver.0917a';
 
     // oauth?
     if (window.location.search.length > 0) {
@@ -337,6 +337,7 @@ async function create_share(checkin) {
         const bsky = new JpzBskyClient(configure.bsky.bsky_id, configure.bsky.bsky_pass);
         bsky.enableCorsProxyAtOgp(true);
         bsky.enableCorsProxyAtGetImage(false);
+        bsky.setClientVia('swarm c2c');
         for (const photo of checkin.photos.items) {
             // bsky.setImageUrl(checkin.photos.items[]);
             const photo_url = get_image_url(photo.width, 0, photo);
