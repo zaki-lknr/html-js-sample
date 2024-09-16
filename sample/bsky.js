@@ -50,7 +50,7 @@ async function post() {
     const {JpzBskyClient} = await import("./bsky-client.js");
 
     const bsky = new JpzBskyClient(configure.bsky_id, configure.bsky_pass);
-    if (local_images) {
+    if (local_images.length > 0) {
         bsky.setImageFiles(local_images);
     }
     if (image_url) {
