@@ -169,8 +169,8 @@ export class JpzBskyClient {
         if (!res.ok) {
             throw new Error(url + ': ' + await res.text());
         }
-        const response = await res.text();
-    
+        // const response = await res.text();
+        // console.log(response);
     }
 
     async #post_image(session) {
@@ -186,13 +186,18 @@ export class JpzBskyClient {
             for (const image_url of this.image_urls) {
                 if (image_url.startsWith('http')) {
                     // get image
-                    const res_img = await fetch('https://corsproxy.io/?' + encodeURIComponent(image_url));
-                    if (!res_img.ok) {
-                        throw new Error('https://corsproxy.io/?' + encodeURIComponent(image_url) + ': ' + await res_img.text());
+                    try {
+                        const res_img = await fetch('https://corsproxy.io/?' + encodeURIComponent(image_url));
+                        if (!res_img.ok) {
+                            throw new Error('https://corsproxy.io/?' + encodeURIComponent(image_url) + ': ' + await res_img.text());
+                        }
+                        const image = await res_img.blob();
+                        const buffer = await image.arrayBuffer();
+                        inputs.push({blob: new Uint8Array(buffer), type: image.type});
                     }
-                    const image = await res_img.blob();
-                    const buffer = await image.arrayBuffer();
-                    inputs.push({blob: new Uint8Array(buffer), type: image.type});
+                    catch(err) {
+                        throw new Error('get image_url failed: ' + err + "\nurl: " + 'https://corsproxy.io/?' + encodeURIComponent(image_url));
+                    }
                 }
             }
         }
@@ -217,27 +222,32 @@ export class JpzBskyClient {
 
     async #get_ogp(url) {
         const proxy_url = 'https://corsproxy.io/?' + encodeURIComponent(url);
-        const res = await fetch(proxy_url);
-        if (!res.ok) {
-            throw new Error('https://corsproxy.io/?' + encodeURIComponent(url) + ': ' + await res.text());
-        }
-        const t = await res.text();
-        const d = new DOMParser().parseFromString(t, "text/html");
-        const ogp = {title: d.title};
-    
-        for (const child of d.head.children) {
-            if (child.tagName === 'META') {
-                switch (child.getAttribute('property')) {
-                    case 'og:description':
-                    case 'og:image':
-                    case 'og:title':
-                        // console.log(child.getAttribute('property') + ': ' + child.getAttribute('content'));
-                        ogp[child.getAttribute('property')] = child.getAttribute('content');
-                        break;
+        try {
+            const res = await fetch(proxy_url);
+            if (!res.ok) {
+                throw new Error('https://corsproxy.io/?' + encodeURIComponent(url) + ': ' + await res.text());
+            }
+            const t = await res.text();
+            const d = new DOMParser().parseFromString(t, "text/html");
+            const ogp = {title: d.title};
+
+            for (const child of d.head.children) {
+                if (child.tagName === 'META') {
+                    switch (child.getAttribute('property')) {
+                        case 'og:description':
+                        case 'og:image':
+                        case 'og:title':
+                            // console.log(child.getAttribute('property') + ': ' + child.getAttribute('content'));
+                            ogp[child.getAttribute('property')] = child.getAttribute('content');
+                            break;
+                    }
                 }
             }
+            return ogp;
         }
-        return ogp;
+        catch(err) {
+            throw new Error('get ogp failed: ' + err + "\nurl: " + 'https://corsproxy.io/?' + encodeURIComponent(url));
+        }
     }
 
     #search_url_pos(message, start_pos = 0) {
