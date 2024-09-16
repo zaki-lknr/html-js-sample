@@ -8,11 +8,13 @@ export class JpzBskyClient {
     image_urls = [];
 
     use_corsproxy_getimage = false;
+    use_corsproxy_getogp = false;
 
     constructor(id, pass) {
         this.bsky_id = id;
         this.bsky_pass = pass;
         this.useCorsProxyByGetImage = false;
+        this.use_corsproxy_getogp = false;
     }
 
     setImageUrl(image_url) {
@@ -26,6 +28,9 @@ export class JpzBskyClient {
 
     enableCorsProxyAtGetImage(useCorsProxy = false) {
         this.use_corsproxy_getimage = useCorsProxy;
+    }
+    enableCorsProxyAtOgp(useCorsProxy = false) {
+        this.use_corsproxy_getogp = useCorsProxy;
     }
 
     // async post(message, attach = null) {
@@ -229,9 +234,9 @@ export class JpzBskyClient {
     }
 
     async #get_ogp(url) {
-        const proxy_url = 'https://corsproxy.io/?' + encodeURIComponent(url);
+        const ogp_url = (this.use_corsproxy_getogp)? 'https://corsproxy.io/?' + encodeURIComponent(url): url;
         try {
-            const res = await fetch(proxy_url);
+            const res = await fetch(ogp_url);
             if (!res.ok) {
                 throw new Error('https://corsproxy.io/?' + encodeURIComponent(url) + ': ' + await res.text());
             }
