@@ -137,7 +137,7 @@ export class JpzBskyClient {
                 }
                 if (image_blob) {
                     // 画像がある場合のみ追加 (無い場合は省略)
-                    body.record.embed.external.thumb = image_blob;
+                    body.record.embed.external.thumb = image_blob[0];
                 }
             }
         }
