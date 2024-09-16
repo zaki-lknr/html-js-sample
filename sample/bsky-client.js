@@ -24,7 +24,7 @@ export class JpzBskyClient {
         this.image_urls.splice(0);
     }
 
-    setCorsProxyByGetImage(useCorsProxy = false) {
+    enableCorsProxyAtGetImage(useCorsProxy = false) {
         this.use_corsproxy_getimage = useCorsProxy;
     }
 

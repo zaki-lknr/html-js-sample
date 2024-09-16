@@ -335,7 +335,7 @@ async function create_share(checkin) {
         const {JpzBskyClient} = await import("./bsky-client.js");
 
         const bsky = new JpzBskyClient(configure.bsky.bsky_id, configure.bsky.bsky_pass);
-        bsky.setCorsProxyByGetImage(false);
+        bsky.enableCorsProxyAtGetImage(false);
         for (const photo of checkin.photos.items) {
             // bsky.setImageUrl(checkin.photos.items[]);
             const photo_url = get_image_url(photo.width, 0, photo);
