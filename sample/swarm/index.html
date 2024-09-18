@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8">
         <title>swarm sample</title>
         <script src="swarm.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,17 +13,50 @@
         <hr/>
         <div id="configure">
             <h2>configure</h2>
-            <label for="oauth_token">OAuth Token</label>
-            <input type="text" id="oauth_token" name="oauth_token" placeholder="OAuth Token"/>
+            <fieldset>
+                <legend>Swarm</legend>
+                <label for="client_id">Client ID</label>
+                <input type="text" id="client_id" name="client_id" placeholder="Swarm Client ID"/>
+                <br/>
+                <label for="client_secret">Client Secret</label>
+                <input type="text" id="client_secret" name="client_secret" placeholder="Swarm Client Secret"/>
+                <br/>
+                <label for="api_key">App API Key</label>
+                <input type="text" id="api_key" name="api_key" placeholder="Swarm App API Key"/>
+                <br/>
+                <label for="oauth_token">OAuth Token</label>
+                <input type="text" id="oauth_token" name="oauth_token" placeholder="Swarm OAuth Token"/>
+                <br/>
+                <button onclick="swarm_oauth()">OAuth</button>
+            </fieldset>
+            <fieldset>
+                <legend>Bluesky</legend>
+                <label for="bsky_id">Bluesky username</label>
+                <input type="text" id="bsky_id" name="bsky_id" placeholder="username.bsky.social"/>
+                <br/>
+                <label for="bsky_pass">Bluesky password</label>
+                <input type="text" id="bsky_pass" name="bsky_pass" placeholder="password"/>
+            </fieldset>
+
             <br/>
             <input type="checkbox" id="view_image" name="view_image" />
             <label for="view_image">View Image</label>
+            <br/>
+            <input type="checkbox" id="post_bsky" name="post_bsky" />
+            <label for="post_bsky">post to Bluesky (auto post)</label>
+            <br/>
+            <input type="checkbox" id="include_sns" name="include_sns" />
+            <label for="include_sns">include twitter account</label>
+            <br/>
+            <input type="checkbox" id="edit_tweet" name="edit_tweet" />
+            <label for="edit_tweet">edit tweet</label>
             <br/>
             <button onclick="save_configure()">save</button>
             <button onclick="load_configure()">load</button>
         </div>
         <hr/>
         <div id="control">
+            <div id="comment"></div>
             <button onclick="reload_data()" id="reload_button">reload</button>
         </div>
         <hr/>
