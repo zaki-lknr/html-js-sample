@@ -1,3 +1,7 @@
+document.addEventListener("DOMContentLoaded", () => {
+    load_data();
+});
+
 const save_configure = () => {
     // console.log("save_configure() begin");
     // get form data
