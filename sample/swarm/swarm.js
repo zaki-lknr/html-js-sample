@@ -1,4 +1,4 @@
-function save_configure() {
+const save_configure = () => {
     // console.log("save_configure() begin");
     // get form data
     const client_id = document.getElementById("client_id").value;
@@ -38,7 +38,7 @@ function save_configure() {
     localStorage.setItem('configure', JSON.stringify(configure));
 }
 
-function load_configure() {
+const load_configure = () => {
     // console.log("load_configure() begin");
 
     const configure = JSON.parse(localStorage.getItem('configure'));
@@ -68,7 +68,7 @@ function load_configure() {
     return configure;
 }
 
-async function reload_data() {
+const reload_data = async() => {
     const configure = load_configure();
     const url = 'https://api.foursquare.com/v2/users/self/checkins?v=20231010&limit=30&offset=0&oauth_token=' + configure.swarm.oauth_token;
     // console.log('url: ' + url);
@@ -86,7 +86,7 @@ async function reload_data() {
     load_data();
 }
 
-function swarm_oauth() {
+const swarm_oauth = () => {
     console.log('swarm_oauth() begin');
     save_configure();
     const configure = load_configure();
@@ -96,7 +96,7 @@ function swarm_oauth() {
 
     window.location.href = url;
 }
-async function swarm_oauth2(code) {
+const swarm_oauth2 = async (code) => {
     console.log('swarm_oauth2() begin');
     const configure = load_configure();
     const client_id = configure?.swarm?.client_id;
@@ -114,7 +114,7 @@ async function swarm_oauth2(code) {
     }
 }
 
-function get_image_url(disp_width, count, photo) {
+const get_image_url = (disp_width, count, photo) => {
     if (count === 0) {
         // count=0はオリジナルの値を返す
         return photo.prefix + photo.width + 'x' + photo.height + photo.suffix;
@@ -131,9 +131,9 @@ function get_image_url(disp_width, count, photo) {
     }
 }
 
-function load_data() {
+const load_data = () => {
     // title version
-    document.getElementById('title').textContent = 'swarm c2c ver.0917a';
+    document.getElementById('title').textContent = 'swarm c2c ver.0920a';
 
     // oauth?
     if (window.location.search.length > 0) {
@@ -270,7 +270,7 @@ function load_data() {
     }
 }
 
-function create_share_string(checkin, twitter_id = null) {
+const create_share_string = (checkin, twitter_id = null) => {
     let location_str = '';
     let return_string;
     let twitter_string = '';
@@ -298,7 +298,7 @@ function create_share_string(checkin, twitter_id = null) {
     return return_string;
 }
 
-function clear_data() {
+const clear_data = () => {
     console.log('clear_data() begin');
     let display = document.getElementById("checkin_list");
     // display.removeChild(display.firstChild);
@@ -310,7 +310,7 @@ function clear_data() {
     }
 }
 
-async function create_share(checkin) {
+const create_share = async (checkin) => {
     const configure = load_configure();
     // console.log("create_share() begin: " + checkin_id);
     // get configure
@@ -355,7 +355,7 @@ async function create_share(checkin) {
     }
 }
 
-async function get_detail(checkin_id, configure) {
+const get_detail = async (checkin_id, configure) => {
     const checkins = localStorage.getItem('rest_response');
     // console.log('checkins: ' + checkins);
     const checkin_data = JSON.parse(checkins);
