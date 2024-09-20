@@ -1,5 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
     load_data();
+
+    // リスナー設定をこの外に記述するとやはり早すぎて無効なのでここ
+    document.getElementById('btn_save').addEventListener('click', ()=> {
+        save_configure();
+    });
+    document.getElementById('btn_load').addEventListener('click', ()=> {
+        load_configure();
+    });
+
 });
 
 const save_configure = () => {
