@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('btn_swm_oauth').addEventListener('click', ()=> {
         swarm_oauth();
     });
+    document.getElementById('btn_reload').addEventListener('click', ()=> {
+        reload_data();
+    });
 
 });
 
@@ -170,7 +173,7 @@ const load_data = () => {
     if (checkins === null) {
         console.log('no data');
         // button文言の更新
-        let button = document.getElementById("reload_button");
+        let button = document.getElementById("btn_reload");
         button.textContent = 'get checkin data';
     }
     else {
