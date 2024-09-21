@@ -154,7 +154,7 @@ const get_image_url = (disp_width, count, photo) => {
 
 const load_data = () => {
     // title version
-    document.getElementById('title').textContent = 'swarm c2c ver.0920a';
+    document.getElementById('title').textContent = 'swarm c2c ver.0920a' + ' / bsky:' + JpzBskyClient.getVersion();
 
     // oauth?
     if (window.location.search.length > 0) {

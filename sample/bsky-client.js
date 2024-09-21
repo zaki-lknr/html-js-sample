@@ -19,6 +19,10 @@ export class JpzBskyClient {
         this.use_corsproxy_getogp = false;
     }
 
+    static getVersion() {
+        return "0.1.0";
+    }
+
     setImageUrl(image_url) {
         this.image_urls.push(image_url);
         this.image_files = null;
