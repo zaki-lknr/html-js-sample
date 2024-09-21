@@ -1,3 +1,5 @@
+import {JpzBskyClient} from "./bsky-client.js";
+
 document.addEventListener("DOMContentLoaded", () => {
     load_data();
 
@@ -351,8 +353,6 @@ const create_share = async (checkin) => {
     }
 
     if (post_bsky) {
-        const {JpzBskyClient} = await import("./bsky-client.js");
-
         const bsky = new JpzBskyClient(configure.bsky.bsky_id, configure.bsky.bsky_pass);
         bsky.enableCorsProxyAtOgp(true);
         bsky.enableCorsProxyAtGetImage(false);
