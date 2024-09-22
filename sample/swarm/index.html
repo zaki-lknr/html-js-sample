@@ -3,12 +3,12 @@
     <head>
         <meta charset="utf-8">
         <title>swarm sample</title>
-        <script src="swarm.js"></script>
+        <script src="swarm.js" type="module"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="style.css" rel="stylesheet" type="text/css" media="all" />
     </head>
 
-    <body onload="load_data()">
+    <body id="body">
         <h1 id="title">swarm sample page</h1>
         <hr/>
         <div id="configure">
@@ -27,7 +27,7 @@
                 <label for="oauth_token">OAuth Token</label>
                 <input type="text" id="oauth_token" name="oauth_token" placeholder="Swarm OAuth Token"/>
                 <br/>
-                <button onclick="swarm_oauth()">OAuth</button>
+                <button id="btn_swm_oauth">OAuth</button>
             </fieldset>
             <fieldset>
                 <legend>Bluesky</legend>
@@ -51,13 +51,13 @@
             <input type="checkbox" id="edit_tweet" name="edit_tweet" />
             <label for="edit_tweet">edit tweet</label>
             <br/>
-            <button onclick="save_configure()">save</button>
-            <button onclick="load_configure()">load</button>
+            <button id="btn_save">save</button>
+            <button id="btn_load">load</button>
         </div>
         <hr/>
         <div id="control">
             <div id="comment"></div>
-            <button onclick="reload_data()" id="reload_button">reload</button>
+            <button id="btn_reload">reload</button>
         </div>
         <hr/>
         <div id="checkin_list">
