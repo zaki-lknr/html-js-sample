@@ -1,5 +1,11 @@
-import {JpzBskyClient} from "./bsky-client.js";
+import {JpzBskyClient} from "./bsky-client/bsky-client.js";
 
+const app_name = "Swarm SGBT";
+const app_version = '0.1.0';
+
+/**
+ * htmlロード時のイベントリスナ設定
+ */
 document.addEventListener("DOMContentLoaded", () => {
     load_data();
 
@@ -19,6 +25,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+/**
+ * 設定保存
+ */
 const save_configure = () => {
     // console.log("save_configure() begin");
     // get form data
@@ -54,11 +63,15 @@ const save_configure = () => {
             bsky_pass: bsky_pass,
         },
     }
-    console.log(configure);
+    // console.log(configure);
     // save to local storage
     localStorage.setItem('configure', JSON.stringify(configure));
 }
 
+/**
+ * 設定読み出し
+ * @returns 設定情報
+ */
 const load_configure = () => {
     // console.log("load_configure() begin");
 
@@ -89,6 +102,9 @@ const load_configure = () => {
     return configure;
 }
 
+/**
+ * チェックインデータ新規取得
+ */
 const reload_data = async() => {
     const configure = load_configure();
     const url = 'https://api.foursquare.com/v2/users/self/checkins?v=20231010&limit=30&offset=0&oauth_token=' + configure.swarm.oauth_token;
@@ -107,23 +123,32 @@ const reload_data = async() => {
     load_data();
 }
 
+/**
+ * Swarm OAuth開始
+ */
 const swarm_oauth = () => {
     console.log('swarm_oauth() begin');
     save_configure();
     const configure = load_configure();
     const client_id = configure?.swarm?.client_id;
-    const redirect_url = 'https://www.jp-z.jp/swarm/';
+    const redirect_url = location.href;
     const url = 'https://foursquare.com/oauth2/authenticate?client_id=' + client_id + '&response_type=code&redirect_uri=' + redirect_url;
 
     window.location.href = url;
 }
+
+/**
+ * Swarm OAuthレスポンス処理
+ * @param {string} トークン
+ */
 const swarm_oauth2 = async (code) => {
     console.log('swarm_oauth2() begin');
     const configure = load_configure();
     const client_id = configure?.swarm?.client_id;
     const client_secret = configure?.swarm?.client_secret;
-    const redirect_url = 'https://www.jp-z.jp/swarm/';
+    const redirect_url = location.href.replace(/\?.*/, '');
     const url = 'https://foursquare.com/oauth2/access_token?client_id=' + client_id + '&client_secret=' + client_secret +'&grant_type=authorization_code&redirect_uri=' + redirect_url + '&code=' + code;
+    // console.log("access to: " + url);
     const res = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
 
     const response = await res.json();
@@ -135,13 +160,20 @@ const swarm_oauth2 = async (code) => {
     }
 }
 
+/**
+ * 添付画像URL取得処理
+ * @param {number} 画面サイズ
+ * @param {number} チェックイン内の総画像数
+ * @param {Object} photoオブジェクト
+ * @returns URL
+ */
 const get_image_url = (disp_width, count, photo) => {
     if (count === 0) {
         // count=0はオリジナルの値を返す
         return photo.prefix + photo.width + 'x' + photo.height + photo.suffix;
     }
     else {
-        let w = disp_width * 0.95;
+        let w = disp_width * 0.95; // fixme
         let h = photo.height * w / photo.width;
         if (count != 1) {
             // さらに半分
@@ -152,12 +184,15 @@ const get_image_url = (disp_width, count, photo) => {
     }
 }
 
+/**
+ * データロードと画面描画
+ */
 const load_data = () => {
     // title version
-    document.getElementById('title').textContent = 'swarm c2c ver.0920a' + ' / bsky:' + JpzBskyClient.getVersion();
+    document.getElementById('title').textContent = app_name + ' ver.' + app_version + ' / bsky:' + JpzBskyClient.getVersion();
 
     // oauth?
-    if (window.location.search.length > 0) {
+    if (window.location.search.length > 0) { // fixme
         const param = new URLSearchParams(window.location.search);
         // console.log(param);
         const code = param.get('code');
@@ -291,6 +326,12 @@ const load_data = () => {
     }
 }
 
+/**
+ * 共有用文字列作成
+ * @param {object} checkinオブジェクト
+ * @param {string} ヴェニューのSNSアカウント名
+ * @returns 共有用文字列
+ */
 const create_share_string = (checkin, twitter_id = null) => {
     let location_str = '';
     let return_string;
@@ -319,6 +360,9 @@ const create_share_string = (checkin, twitter_id = null) => {
     return return_string;
 }
 
+/**
+ * チェックインリストの表示クリア
+ */
 const clear_data = () => {
     console.log('clear_data() begin');
     let display = document.getElementById("checkin_list");
@@ -331,6 +375,10 @@ const clear_data = () => {
     }
 }
 
+/**
+ * シェアボタン押下
+ * @param {object} checkinオブジェクト
+ */
 const create_share = async (checkin) => {
     const configure = load_configure();
     // console.log("create_share() begin: " + checkin_id);
@@ -356,7 +404,7 @@ const create_share = async (checkin) => {
         const bsky = new JpzBskyClient(configure.bsky.bsky_id, configure.bsky.bsky_pass);
         bsky.enableCorsProxyAtOgp(true);
         bsky.enableCorsProxyAtGetImage(false);
-        bsky.setClientVia('swarm c2c');
+        bsky.setClientVia(app_name);
         for (const photo of checkin.photos.items) {
             // bsky.setImageUrl(checkin.photos.items[]);
             const photo_url = get_image_url(photo.width, 0, photo);
@@ -374,6 +422,12 @@ const create_share = async (checkin) => {
     }
 }
 
+/**
+ * チェックイン詳細取得
+ * @param {string} チェックインID
+ * @param {object} 設定オブジェクト
+ * @returns
+ */
 const get_detail = async (checkin_id, configure) => {
     const checkins = localStorage.getItem('rest_response');
     // console.log('checkins: ' + checkins);
