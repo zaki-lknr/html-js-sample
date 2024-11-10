@@ -1,0 +1,20 @@
+
+@import url(./check-style.css);
+
+.box1 {
+    position: relative;
+    width: auto;
+    height: auto;
+    /* margin: auto; */
+    margin-left: 250px;
+}
+
+.box1 div {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    color: #FFF;
+}
+
+
+/* ------------------------ */
