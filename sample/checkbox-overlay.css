@@ -1,5 +1,10 @@
-
 @import url(./check-style.css);
+
+:root {
+    --line-color: #f2a7bb;
+    --check-color: #ffffff;
+    --background-color: #454090;
+}
 
 .box1 {
     position: relative;
