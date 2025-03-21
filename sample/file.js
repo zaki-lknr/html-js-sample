@@ -1,5 +1,5 @@
 
-function get_image() {
+async function get_image() {
     console.log("start")
 
     const file_path = document.getElementById("file").files[0];
@@ -9,26 +9,31 @@ function get_image() {
         return;
     }
 
-    set_image_data(file_path);
+    const r = await set_image_data(file_path);
+    set_image_to_view(r);
 }
 
 function set_image_data(file_path) {
-    const reader = new FileReader();
-    console.log(reader);
-    reader.readAsDataURL(file_path);
 
-    reader.onload = function() {
-        const r = reader.result;
-        console.log(r);
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        // console.log(reader);
+        reader.onload = () => {
+            const r = reader.result;
+            console.log(r);
+            resolve(r);
+        };
+        reader.onerror = (e) => reject(e);
 
-        set_image_to_view(r);
-        // return r;  // 非同期で動作してるのでget_image_data()の呼び出し元へは返らない
-    }
+        reader.readAsDataURL(file_path);
+    })
 }
 
 function set_image_to_view(r) {
     const img = document.createElement("img");
     img.src = r;
+    console.log(img.width);
+    console.log(img.height);
 
     const div = document.getElementById('view');
     div.appendChild(img);
