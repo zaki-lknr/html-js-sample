@@ -24,4 +24,7 @@ const press_here = () => {
     console.log("pressed here.");
     const p = new Person("aaa", 17);
     p.hello();
+
+    const version = Person.getVersion();
+    console.log('version: ' + version);
 }
