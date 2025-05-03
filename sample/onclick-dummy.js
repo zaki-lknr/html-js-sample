@@ -5,13 +5,25 @@
 // import {Person} from "./onclick-dummy-library.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log('DOMContentLoaded begin');
     const elm = document.createElement('script');
     elm.src = 'onclick-dummy-library.js';
     // elm.type = 'module';
     // console.log(elm);
     // console.log(document.body);
     document.body.appendChild(elm);
+
+    // // これは不可
+    // const version = Person.getVersion();
+    // console.log('version: ' + version);
+
 });
+
+window.addEventListener('load', () => {
+    console.log('load begin');
+    const version = Person.getVersion();
+    console.log('version: ' + version);
+})
 
 const hello_world = () => {
     console.log("hello_world");
