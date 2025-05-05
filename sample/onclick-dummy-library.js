@@ -1,5 +1,5 @@
-// export class Person {
-class Person {
+
+export class Person {
     name;
     age;
 
